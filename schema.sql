@@ -1,0 +1,2 @@
+-- Schema database sudah dijalankan di project Supabase.
+-- Jangan jalankan ulang tanpa instruksi.
