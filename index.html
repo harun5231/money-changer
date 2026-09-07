@@ -26,13 +26,13 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 }
 </style></head>
 <body>
-<header><div class="head"><div><h1>Money Changer</h1><div class="muted">V1 Clean • Modal • Kurs dasar</div></div><button id="logout" class="hidden">Keluar</button></div></header>
+<header><div class="head"><div><h1>Money Changer</h1></div><button id="logout" class="hidden">Keluar</button></div></header>
 <main>
 <section id="login" class="panel"><h2>Masuk</h2><div class="field"><label>Email</label><input id="email" type="email"></div><div class="field"><label>Password</label><input id="password" type="password"></div><div class="actions"><button id="loginBtn" class="primary">Masuk</button><button id="signupBtn">Buat akun</button></div><div id="loginMsg" class="status"></div></section>
 <section id="app" class="hidden">
 <div class="grid"><div class="card"><div class="label">Total IDR</div><div id="baseBal" class="big">Rp0</div></div><div class="card"><div class="label">Total USD</div><div id="tradeBal" class="big">$0</div></div><div class="card"><div class="label">USD di Tangan</div><div id="usdHand" class="big">$0</div></div><div class="card"><div class="label">Profit Bulan Ini</div><div id="profit" class="big">Rp0</div></div><div class="card"><div class="label">Kurs Dasar</div><div id="basis" class="big">Rp0/USD</div></div></div>
 <div class="panel"><div class="row"><div><div class="label">Kurs otomatis</div><div id="marketRate" class="big">Memuat...</div><div id="rateMsg" class="muted"></div></div><button id="refreshRate">Refresh</button></div><hr style="border-color:#292c2a"><div class="grid"><div><div class="label">USD → KHR</div><div id="localRate" class="big">4.000</div></div><div><div class="label">Kurs beli USD</div><div id="buyRate" class="big">Rp0</div></div><div><div class="label">Kurs jual USD</div><div id="sellRate" class="big">Rp0</div></div></div></div>
-<div class="panel"><div class="actions"><button id="capitalBtn" class="primary">Modal awal / tambah modal</button><button id="buyBtn">Customer beli USD</button><button id="sellBtn">Customer jual USD</button><button id="settingsBtn">Pengaturan</button><button id="resetBtn">Reset / Tutup Bulan</button></div></div><div class="panel"><h3>Bagikan Harga ke Customer</h3><div class="actions share-actions"><button id="shareBuyBtn" class="primary">Bagikan Harga Beli USD</button><button id="shareSellBtn">Bagikan Harga Jual USD</button></div><div class="muted" style="margin-top:8px;font-size:12px">Pilih aplikasi tujuan dari menu bagikan HP.</div></div>
+<div class="panel"><div class="actions"><button id="capitalBtn" class="primary">Modal awal / tambah modal</button><button id="buyBtn">Customer beli USD</button><button id="sellBtn">Customer jual USD</button><button id="settingsBtn">Pengaturan</button><button id="resetBtn">Reset / Tutup Bulan</button></div></div><div class="panel"><h3>Bagikan Harga</h3><div class="actions share-actions"><button id="shareBuyBtn" class="primary">HARGA BELI</button><button id="shareSellBtn">HARGA JUAL</button></div></div>
 <div class="panel"><div class="row"><h3>Riwayat Transaksi</h3><button id="reload">Refresh</button></div><div id="history" class="history-list"></div></div><div class="panel"><div class="row"><h3>Profit Bulanan</h3><button id="reloadProfit">Refresh</button></div><div style="overflow:auto"><table><thead><tr><th>Bulan</th><th>Profit</th><th>Ditutup</th></tr></thead><tbody id="profitHistory"></tbody></table></div></div>
 </section></main>
 <div id="modal" class="modal hidden"><div class="modalbox"><div class="row"><h2 id="modalTitle">Form</h2><button id="close">Tutup</button></div><div id="modalBody"></div><div id="modalMsg" class="status"></div></div></div>
@@ -139,11 +139,11 @@ function currentBuyRate(){
 }
 function currentSellRate(){ return market?round(market*(1-Number(settings.sell_margin))):0; }
 $("shareBuyBtn").onclick=()=>{
-  const text=`HARGA BELI USD\n\nKurs: ${idr(currentBuyRate())}/USD\n\nPembayaran dapat dilakukan ke:\nBank: ${settings.bank_name||"-"}\nNo. Rekening: ${settings.bank_account_number||"-"}\nAtas Nama: ${settings.bank_account_name||"-"}`;
+  const text=`HARGA BELI\nKURS/RATE: ${idr(currentBuyRate())}/USD\nNAMA BANK: ${settings.bank_name||"-"}\nNOMOR REKENING: ${settings.bank_account_number||"-"}\nNAMA REKENING: ${settings.bank_account_name||"-"}`;
   shareText("Harga Beli USD",text);
 };
 $("shareSellBtn").onclick=()=>{
-  const text=`HARGA JUAL USD\n\nKurs: ${idr(currentSellRate())}/USD\n\nSilakan hubungi kami untuk transaksi.`;
+  const text=`HARGA JUAL\nKURS/RATE: ${idr(currentSellRate())}/USD`;
   shareText("Harga Jual USD",text);
 };
 $("loginBtn").onclick=async()=>{let {data,error}=await sb.auth.signInWithPassword({email:$("email").value,password:$("password").value});$("loginMsg").textContent=error?error.message:"Berhasil masuk";if(!error)start(data.user)};
