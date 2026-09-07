@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Money Changer</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#101210;color:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{padding:22px 18px;border-bottom:1px solid #292c2a;background:#101210eF;position:sticky;top:0;z-index:5}
+main{max-width:900px;margin:auto;padding:16px}.head{display:flex;justify-content:space-between;align-items:center}
+h1{font-size:25px;margin:0}h2,h3{margin-top:0}.muted{color:#929893}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.card,.panel{background:#181b19;border:1px solid #303330;border-radius:16px;padding:16px;margin-bottom:14px}.label{font-size:12px;color:#9da29e;text-transform:uppercase;letter-spacing:.08em}.big{font-size:21px;font-weight:700;margin-top:7px}
+.row{display:flex;gap:12px;align-items:center;justify-content:space-between}.row>*{flex:1}button,input{font:inherit}button{padding:11px 14px;border-radius:10px;border:1px solid #3c413e;background:#222622;color:#fff;font-weight:600}button.primary{background:#087f4f;border-color:#0a9d63}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid #3c413e;background:#101210;color:#fff}.field{margin:11px 0}.field label{display:block;color:#b6bbb7;font-size:13px;margin-bottom:6px}
+.actions{display:flex;gap:9px;flex-wrap:wrap}.actions button{flex:1;min-width:130px}.status{padding:10px;margin:10px 0;border-radius:10px;background:#141715;color:#b8bdb9;font-size:13px}.err{color:#ff9090}.ok{color:#55d99b}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:10px 6px;border-bottom:1px solid #292c2a}th{color:#929893;font-weight:500}
+.history-list{display:flex;flex-direction:column}.history-item{padding:12px 0;border-bottom:1px solid #292c2a}.history-item:last-child{border-bottom:0}.history-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.history-type{font-weight:700}.history-time{color:#929893;font-size:12px;white-space:nowrap}.history-details{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:9px}.history-detail{min-width:0}.history-detail .label{font-size:10px}.history-value{font-weight:700;margin-top:3px;overflow-wrap:anywhere}.share-actions button{min-width:150px}
+.hidden{display:none!important}.modal{position:fixed;inset:0;background:#0009;z-index:20;display:flex;align-items:flex-end}.modalbox{width:min(620px,100%);max-height:90vh;overflow:auto;background:#181b19;border:1px solid #303330;border-radius:20px 20px 0 0;padding:18px}
+@media(max-width:650px){
+  .grid{grid-template-columns:1fr}.row{flex-direction:column;align-items:stretch}main{padding:12px}
+  .history-details{grid-template-columns:repeat(2,1fr);gap:7px}
+  .history-item{padding:13px 2px}
+  .history-top{gap:8px}.history-time{font-size:11px}
+  .history-value{font-size:13px}
+  .panel{padding:14px}
+}
+</style></head>
+<body>
+<header><div class="head"><div><h1>Money Changer</h1><div class="muted">V1 Clean • Modal • Kurs dasar</div></div><button id="logout" class="hidden">Keluar</button></div></header>
+<main>
+<section id="login" class="panel"><h2>Masuk</h2><div class="field"><label>Email</label><input id="email" type="email"></div><div class="field"><label>Password</label><input id="password" type="password"></div><div class="actions"><button id="loginBtn" class="primary">Masuk</button><button id="signupBtn">Buat akun</button></div><div id="loginMsg" class="status"></div></section>
+<section id="app" class="hidden">
+<div class="grid"><div class="card"><div class="label">Total IDR</div><div id="baseBal" class="big">Rp0</div></div><div class="card"><div class="label">Total USD</div><div id="tradeBal" class="big">$0</div></div><div class="card"><div class="label">USD di Tangan</div><div id="usdHand" class="big">$0</div></div><div class="card"><div class="label">Profit Bulan Ini</div><div id="profit" class="big">Rp0</div></div><div class="card"><div class="label">Kurs Dasar</div><div id="basis" class="big">Rp0/USD</div></div></div>
+<div class="panel"><div class="row"><div><div class="label">Kurs otomatis</div><div id="marketRate" class="big">Memuat...</div><div id="rateMsg" class="muted"></div></div><button id="refreshRate">Refresh</button></div><hr style="border-color:#292c2a"><div class="grid"><div><div class="label">USD → KHR</div><div id="localRate" class="big">4.000</div></div><div><div class="label">Kurs beli USD</div><div id="buyRate" class="big">Rp0</div></div><div><div class="label">Kurs jual USD</div><div id="sellRate" class="big">Rp0</div></div></div></div>
+<div class="panel"><div class="actions"><button id="capitalBtn" class="primary">Modal awal / tambah modal</button><button id="buyBtn">Customer beli USD</button><button id="sellBtn">Customer jual USD</button><button id="settingsBtn">Pengaturan</button><button id="resetBtn">Reset / Tutup Bulan</button></div></div><div class="panel"><h3>Bagikan Harga ke Customer</h3><div class="actions share-actions"><button id="shareBuyBtn" class="primary">Bagikan Harga Beli USD</button><button id="shareSellBtn">Bagikan Harga Jual USD</button></div><div class="muted" style="margin-top:8px;font-size:12px">Pilih aplikasi tujuan dari menu bagikan HP.</div></div>
+<div class="panel"><div class="row"><h3>Riwayat Transaksi</h3><button id="reload">Refresh</button></div><div id="history" class="history-list"></div></div><div class="panel"><div class="row"><h3>Profit Bulanan</h3><button id="reloadProfit">Refresh</button></div><div style="overflow:auto"><table><thead><tr><th>Bulan</th><th>Profit</th><th>Ditutup</th></tr></thead><tbody id="profitHistory"></tbody></table></div></div>
+</section></main>
+<div id="modal" class="modal hidden"><div class="modalbox"><div class="row"><h2 id="modalTitle">Form</h2><button id="close">Tutup</button></div><div id="modalBody"></div><div id="modalMsg" class="status"></div></div></div>
+<script>
+const {createClient}=supabase, sb=createClient(MC_CONFIG.SUPABASE_URL,MC_CONFIG.SUPABASE_PUBLISHABLE_KEY);let user,settings,balance,market=0;
+const $=x=>document.getElementById(x), idr=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(n)||0), num=n=>new Intl.NumberFormat("id-ID",{maximumFractionDigits:2}).format(Number(n)||0);
+const typ=t=>({ADD_CAPITAL:"Tambah modal",INITIAL_CAPITAL:"Modal awal",CUSTOMER_BUY:"Customer beli USD",CUSTOMER_SELL:"Customer jual USD"}[t]||t);
+const round=x=>Math.round(x/Number(settings.rounding_unit||100))*Number(settings.rounding_unit||100);
+const formatInput=n=>{
+  const s=String(n??"").replace(/[^0-9,.-]/g,"");
+  if(!s)return "";
+  const neg=s.startsWith("-")?"-":"", clean=s.replace(/-/g,""), parts=clean.split(",");
+  const intPart=(parts[0]||"").replace(/\./g,"").replace(/^0+(?=\d)/,"")||"0";
+  const grouped=intPart.replace(/\B(?=(\d{3})+(?!\d))/g,".");
+  return neg+grouped+(parts.length>1?","+parts.slice(1).join("").replace(/[^0-9]/g,""):"");
+};
+const rawNumber=v=>{
+  const s=String(v??"").trim().replace(/\s/g,"");
+  if(!s)return 0;
+  const normalized=s.includes(",")?s.replace(/\./g,"").replace(",","."):s.replace(/\./g,"");
+  return Number(normalized)||0;
+};
+const bindAmountInput=id=>{
+  const el=$(id); if(!el)return;
+  el.addEventListener("input",()=>{const pos=el.selectionStart;const before=el.value;const raw=before.replace(/[^0-9,]/g,"");el.value=formatInput(raw);});
+  el.addEventListener("blur",()=>{el.value=formatInput(el.value)});
+};
+async function load(){let s=await sb.from("mc_settings").select("*").single(),b=await sb.from("mc_balances").select("*").single();if(s.error||b.error)throw Error((s.error||b.error).message);settings=s.data;balance=b.data;let basis=Number(balance.trade_amount)>0?Number(balance.base_amount)/Number(balance.trade_amount):0;$("baseBal").textContent=idr(balance.base_amount);$("tradeBal").textContent="$"+num(balance.trade_amount);$("usdHand").textContent="$"+num(balance.usd_in_hand);$("profit").textContent=idr(balance.profit_month_idr);$("basis").textContent=idr(basis)+"/USD";$("localRate").textContent=num(settings.usd_local_rate);$("buyRate").textContent=basis?idr(round(basis*(1+Number(settings.buy_margin)) )):"Rp0";if(market)$("sellRate").textContent=idr(round(market*(1-Number(settings.sell_margin))));}
+async function hist(){
+  let {data,error}=await sb.from("mc_transactions").select("*").order("created_at",{ascending:false}).limit(50);
+  const box=$("history");
+  if(error){
+    box.innerHTML=`<div class="status err">${error.message}</div>`;
+    return;
+  }
+  const rows=data||[];
+  if(!rows.length){
+    box.innerHTML='<div class="muted">Belum ada transaksi</div>';
+    return;
+  }
+  box.innerHTML=rows.map(x=>{
+    const rate=Number(x.customer_rate)||0;
+    const shownIdr=x.transaction_type==="CUSTOMER_BUY"&&rate
+      ?Math.abs(Number(x.trade_amount)||0)*rate
+      :Number(x.base_amount)||0;
+    const usd=num(x.trade_amount);
+    const idrValue=idr(shownIdr);
+    const kurs=rate?idr(rate):"-";
+    const time=new Date(x.created_at).toLocaleString("id-ID",{day:"numeric",month:"numeric",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"});
+    return `<div class="history-item">
+      <div class="history-top">
+        <div class="history-type">${typ(x.transaction_type)}</div>
+        <div class="history-time">${time}</div>
+      </div>
+      <div class="history-details">
+        <div class="history-detail"><div class="label">USD</div><div class="history-value">${usd}</div></div>
+        <div class="history-detail"><div class="label">IDR</div><div class="history-value">${idrValue}</div></div>
+        <div class="history-detail"><div class="label">Kurs</div><div class="history-value">${kurs}</div></div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+async function profitHistory(){let {data,error}=await sb.from("mc_monthly_profit").select("*").eq("user_id",user.id).order("period_start",{ascending:false});$("profitHistory").innerHTML=error?`<tr><td colspan=3 class=err>${error.message}</td></tr>`:(data||[]).map(x=>`<tr><td>${new Date(x.period_start+"T00:00:00").toLocaleDateString("id-ID",{month:"long",year:"numeric"})}</td><td>${idr(x.profit_idr)}</td><td>${new Date(x.closed_at).toLocaleString("id-ID")}</td></tr>`).join("")||'<tr><td colspan=3 class=muted>Belum ada bulan yang ditutup</td></tr>';}
+
+async function rates(){try{let r=await fetch("https://api.exchangerate.fun/latest?base=USD",{cache:"no-store"}),j=await r.json();market=Number(j.rates?.[settings.base_currency]);if(!market)throw Error();$("marketRate").textContent=idr(market)+"/USD";$("rateMsg").textContent="Kurs pasar otomatis";$("sellRate").textContent=idr(round(market*(1-Number(settings.sell_margin))))}catch(e){$("marketRate").textContent="Gagal memuat";$("rateMsg").textContent="Kurs dapat dimasukkan manual saat transaksi";}}
+function modal(t,b){$("modalTitle").textContent=t;$("modalBody").innerHTML=b;$("modalMsg").textContent="";$("modalMsg").className="status";$("modal").classList.remove("hidden")}$("close").onclick=()=>$("modal").classList.add("hidden");
+$("capitalBtn").onclick=()=>{
+  modal("Modal awal / tambah modal",'<div class=field><label>IDR</label><input id=a inputmode=decimal autocomplete=off></div><div class=field><label>USD</label><input id=u inputmode=decimal autocomplete=off></div><button id=go class=primary>Simpan modal</button>');
+  bindAmountInput("a");bindAmountInput("u");
+  $("go").onclick=async()=>{
+    let {error}=await sb.rpc("mc_add_capital",{p_base_amount:rawNumber($("a").value),p_trade_amount:rawNumber($("u").value)});
+    if(error){$("modalMsg").textContent=error.message;$("modalMsg").className="status err";return}
+    $("modal").classList.add("hidden");await load();await hist()
+  }
+};
+$("buyBtn").onclick=()=>{
+  modal("Customer beli USD",'<p class=muted>Customer memberikan IDR, menerima USD.</p><div class=field><label>Jumlah USD</label><input id=u inputmode=decimal autocomplete=off></div><div class=field><label>Nama customer (opsional)</label><input id=n></div><button id=go class=primary>Proses</button>');
+  bindAmountInput("u");
+  $("go").onclick=async()=>{
+    let {data,error}=await sb.rpc("mc_customer_buy",{p_trade_amount:rawNumber($("u").value),p_customer_name:$("n").value||null});
+    if(error){$("modalMsg").textContent=error.message;$("modalMsg").className="status err";return}
+    $("modalMsg").textContent="Berhasil. Kurs "+idr(data.rate);$("modalMsg").className="status ok";await load();await hist()
+  }
+};
+$("sellBtn").onclick=()=>{
+  modal("Customer jual USD",'<p class=muted>Customer memberikan USD, menerima IDR.</p><div class=field><label>Jumlah USD</label><input id=u inputmode=decimal autocomplete=off></div><div class=field><label>Kurs pasar USD/IDR</label><input id=r inputmode=decimal value="'+(market||"")+'"></div><div class=field><label>Nama customer (opsional)</label><input id=n></div><button id=go class=primary>Proses</button>');
+  bindAmountInput("u");
+  $("go").onclick=async()=>{
+    let {data,error}=await sb.rpc("mc_customer_sell",{p_trade_amount:rawNumber($("u").value),p_market_rate:rawNumber($("r").value),p_customer_name:$("n").value||null});
+    if(error){$("modalMsg").textContent=error.message;$("modalMsg").className="status err";return}
+    $("modalMsg").textContent="Berhasil. Kurs "+idr((data&&data.customer_rate)||round(rawNumber($("r").value)*(1-Number(settings.sell_margin))));$("modalMsg").className="status ok";await load();await hist()
+  }
+};
+$("settingsBtn").onclick=()=>{modal("Pengaturan",'<div class=field><label>Mata uang modal</label><input id=b value="'+settings.base_currency+'"></div><div class=field><label>Mata uang utama</label><input id=t value="'+settings.trade_currency+'"></div><div class=field><label>Mata uang lokal</label><input id=l value="'+settings.local_currency+'"></div><div class=field><label>Margin beli (%)</label><input id=mb value="'+Number(settings.buy_margin)*100+'"></div><div class=field><label>Margin jual (%)</label><input id=ms value="'+Number(settings.sell_margin)*100+'"></div><div class=field><label>Profit jual USD per $1 (IDR)</label><input id=ca value="'+settings.capital_add_per_unit+'"></div><div class=field><label>Pembulatan kurs</label><input id=ru value="'+settings.rounding_unit+'"></div><div class=field><label>USD → KHR</label><input id=lr value="'+settings.usd_local_rate+'"></div><hr style="border-color:#292c2a;margin:16px 0"><div class=field><label>Nama Bank</label><input id=bn value="'+(settings.bank_name||"")+'" autocomplete="organization"></div><div class=field><label>Nomor Rekening</label><input id=ba value="'+(settings.bank_account_number||"")+'" inputmode="numeric" autocomplete="off"></div><div class=field><label>Atas Nama</label><input id=ban value="'+(settings.bank_account_name||"")+'" autocomplete="name"></div><button id=go class=primary>Simpan pengaturan</button>');$("go").onclick=async()=>{let p={base_currency:$("b").value.trim().toUpperCase(),trade_currency:$("t").value.trim().toUpperCase(),local_currency:$("l").value.trim().toUpperCase(),buy_margin:Number($("mb").value)/100,sell_margin:Number($("ms").value)/100,capital_add_per_unit:Number($("ca").value),rounding_unit:Number($("ru").value),usd_local_rate:Number($("lr").value),bank_name:$("bn").value.trim(),bank_account_number:$("ba").value.trim(),bank_account_name:$("ban").value.trim(),updated_at:new Date().toISOString()};let {error}=await sb.from("mc_settings").update(p).eq("user_id",user.id);if(error){$("modalMsg").textContent=error.message;$("modalMsg").className="status err";return}$("modal").classList.add("hidden");await load();await rates()}};
+function shareText(title,text){
+  if(navigator.share){ navigator.share({title,text}).catch(()=>{}); }
+  else if(navigator.clipboard){ navigator.clipboard.writeText(text).then(()=>alert("Pesan disalin. Silakan tempel ke aplikasi pilihan Anda.")); }
+  else { prompt("Salin pesan ini:",text); }
+}
+function currentBuyRate(){
+  const basis=Number(balance?.trade_amount)>0?Number(balance.base_amount)/Number(balance.trade_amount):0;
+  return basis?round(basis*(1+Number(settings.buy_margin))):0;
+}
+function currentSellRate(){ return market?round(market*(1-Number(settings.sell_margin))):0; }
+$("shareBuyBtn").onclick=()=>{
+  const text=`HARGA BELI USD\n\nKurs: ${idr(currentBuyRate())}/USD\n\nPembayaran dapat dilakukan ke:\nBank: ${settings.bank_name||"-"}\nNo. Rekening: ${settings.bank_account_number||"-"}\nAtas Nama: ${settings.bank_account_name||"-"}`;
+  shareText("Harga Beli USD",text);
+};
+$("shareSellBtn").onclick=()=>{
+  const text=`HARGA JUAL USD\n\nKurs: ${idr(currentSellRate())}/USD\n\nSilakan hubungi kami untuk transaksi.`;
+  shareText("Harga Jual USD",text);
+};
+$("loginBtn").onclick=async()=>{let {data,error}=await sb.auth.signInWithPassword({email:$("email").value,password:$("password").value});$("loginMsg").textContent=error?error.message:"Berhasil masuk";if(!error)start(data.user)};
+$("signupBtn").onclick=async()=>{let {data,error}=await sb.auth.signUp({email:$("email").value,password:$("password").value});$("loginMsg").textContent=error?error.message:(data.session?"Akun dibuat":"Akun dibuat, cek email verifikasi")};
+$("logout").onclick=async()=>{await sb.auth.signOut();location.reload()};$("refreshRate").onclick=rates;$("reload").onclick=hist;$("reloadProfit").onclick=profitHistory;
+$("resetBtn").onclick=async()=>{if(!confirm("Tutup bulan dan reset Total IDR, Total USD, USD di Tangan, serta Profit Bulan Ini? Riwayat tetap tersimpan."))return;let {data,error}=await sb.rpc("mc_reset_month");if(error)return alert("Gagal reset: "+error.message);alert("Bulan ditutup. Profit sebelumnya: "+idr(data.previous_profit_idr));await load();await hist();await profitHistory();};
+async function start(u){user=u;$("login").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");try{await load();await hist();await profitHistory();await rates()}catch(e){alert("Database belum siap: "+e.message)}}
+sb.auth.getSession().then(x=>{if(x.data.session)start(x.data.session.user)});
+</script></body></html>
