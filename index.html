@@ -98,7 +98,18 @@ async function hist(){
 
 async function profitHistory(){let {data,error}=await sb.from("mc_monthly_profit").select("*").eq("user_id",user.id).order("period_start",{ascending:false});$("profitHistory").innerHTML=error?`<tr><td colspan=3 class=err>${error.message}</td></tr>`:(data||[]).map(x=>`<tr><td>${new Date(x.period_start+"T00:00:00").toLocaleDateString("id-ID",{month:"long",year:"numeric"})}</td><td>${idr(x.profit_idr)}</td><td>${new Date(x.closed_at).toLocaleString("id-ID")}</td></tr>`).join("")||'<tr><td colspan=3 class=muted>Belum ada bulan yang ditutup</td></tr>';}
 
-async function rates(){try{let r=await fetch("https://api.exchangerate.fun/latest?base=USD",{cache:"no-store"}),j=await r.json();market=Number(j.rates?.[settings.base_currency]);if(!market)throw Error();$("marketRate").textContent=idr(market)+"/USD";$("rateMsg").textContent="Kurs pasar otomatis";$("sellRate").textContent=idr(round(market*(1-Number(settings.sell_margin))))}catch(e){$("marketRate").textContent="Gagal memuat";$("rateMsg").textContent="Kurs dapat dimasukkan manual saat transaksi";}}
+async function rates(){try{
+  const r=await fetch("https://api.exchangerate.dev/v1/latest/USD?symbols="+encodeURIComponent(settings.base_currency),{cache:"no-store"});
+  const j=await r.json();
+  market=Number(j.rates?.[settings.base_currency]);
+  if(!market)throw Error();
+  $("marketRate").textContent=idr(market)+"/USD";
+  $("rateMsg").textContent="Kurs pasar otomatis";
+  $("sellRate").textContent=idr(round(market*(1-Number(settings.sell_margin))));
+}catch(e){
+  $("marketRate").textContent="Gagal memuat";
+  $("rateMsg").textContent="Kurs dapat dimasukkan manual saat transaksi";
+}}
 function modal(t,b){$("modalTitle").textContent=t;$("modalBody").innerHTML=b;$("modalMsg").textContent="";$("modalMsg").className="status";$("modal").classList.remove("hidden")}$("close").onclick=()=>$("modal").classList.add("hidden");
 $("capitalBtn").onclick=()=>{
   modal("Modal awal / tambah modal",'<div class=field><label>IDR</label><input id=a inputmode=decimal autocomplete=off></div><div class=field><label>USD</label><input id=u inputmode=decimal autocomplete=off></div><button id=go class=primary>Simpan modal</button>');
