@@ -119,7 +119,7 @@ $("buyBtn").onclick=()=>{
   }
 };
 $("sellBtn").onclick=()=>{
-  modal("Customer jual USD",'<p class=muted>Customer memberikan USD, menerima IDR.</p><div class=field><label>Jumlah USD</label><input id=u inputmode=decimal autocomplete=off></div><div class=field><label>Kurs pasar USD/IDR</label><input id=r inputmode=decimal value="'+(market||"")+'"></div><div class=field><label>Nama customer (opsional)</label><input id=n></div><button id=go class=primary>Proses</button>');
+  modal("Customer jual USD",'<p class=muted>Customer memberikan USD, menerima IDR.</p><div class=field><label>Jumlah USD</label><input id=u inputmode=decimal autocomplete=off></div><div class=field><label>Kurs pasar USD/IDR</label><input id=r inputmode=decimal value="'+(market?Math.round(market):"")+'"></div><div class=field><label>Nama customer (opsional)</label><input id=n></div><button id=go class=primary>Proses</button>');
   bindAmountInput("u");
   $("go").onclick=async()=>{
     let {data,error}=await sb.rpc("mc_customer_sell",{p_trade_amount:rawNumber($("u").value),p_market_rate:rawNumber($("r").value),p_customer_name:$("n").value||null});
