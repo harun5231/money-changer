@@ -60,7 +60,7 @@ const bindAmountInput=id=>{
   el.addEventListener("input",()=>{const pos=el.selectionStart;const before=el.value;const raw=before.replace(/[^0-9,]/g,"");el.value=formatInput(raw);});
   el.addEventListener("blur",()=>{el.value=formatInput(el.value)});
 };
-async function load(){let s=await sb.from("mc_settings").select("*").single(),b=await sb.from("mc_balances").select("*").single();if(s.error||b.error)throw Error((s.error||b.error).message);settings=s.data;balance=b.data;let basis=Number(balance.trade_amount)>0?Number(balance.base_amount)/Number(balance.trade_amount):0;$("baseBal").textContent=idr(balance.base_amount);$("tradeBal").textContent="$"+num(balance.trade_amount);$("usdHand").textContent="$"+num(balance.usd_in_hand);$("profit").textContent=idr(balance.profit_month_idr);$("basis").textContent=idr(basis)+"/USD";$("localRate").textContent=num(settings.usd_local_rate);$("buyRate").textContent=basis?idr(round(basis*(1+Number(settings.buy_margin)) )):"Rp0";if(market)$("sellRate").textContent=idr(round(market*(1-Number(settings.sell_margin))));}
+async function load(){let s=await sb.from("mc_settings").select("*").single(),b=await sb.from("mc_balances").select("*").single();if(s.error||b.error)throw Error((s.error||b.error).message);settings=s.data;balance=b.data;let basis=Number(balance.trade_amount)>0?Number(balance.base_amount)/Number(balance.trade_amount):0;$("baseBal").textContent=idr(balance.base_amount);$("tradeBal").textContent="$"+num(balance.trade_amount);$("usdHand").textContent="$"+num(balance.usd_in_hand);$("profit").textContent=idr(balance.profit_month_idr);$("basis").textContent=idr(basis)+"/USD";$("localRate").textContent=num(settings.usd_local_rate);$("buyRate").textContent=basis?idr(round(basis*(1+Number(settings.buy_margin)) )):"Rp0";if(market)$("sellRate").textContent=idr(Math.floor(market*(1-Number(settings.sell_margin))/Number(settings.rounding_unit||100))*Number(settings.rounding_unit||100));}
 async function hist(){
   let {data,error}=await sb.from("mc_transactions").select("*").order("created_at",{ascending:false}).limit(50);
   const box=$("history");
@@ -98,7 +98,7 @@ async function hist(){
 
 async function profitHistory(){let {data,error}=await sb.from("mc_monthly_profit").select("*").eq("user_id",user.id).order("period_start",{ascending:false});$("profitHistory").innerHTML=error?`<tr><td colspan=3 class=err>${error.message}</td></tr>`:(data||[]).map(x=>`<tr><td>${new Date(x.period_start+"T00:00:00").toLocaleDateString("id-ID",{month:"long",year:"numeric"})}</td><td>${idr(x.profit_idr)}</td><td>${new Date(x.closed_at).toLocaleString("id-ID")}</td></tr>`).join("")||'<tr><td colspan=3 class=muted>Belum ada bulan yang ditutup</td></tr>';}
 
-async function rates(){try{let r=await fetch("https://api.exchangerate.fun/latest?base=USD",{cache:"no-store"}),j=await r.json();market=Number(j.rates?.[settings.base_currency]);if(!market)throw Error();$("marketRate").textContent=idr(market)+"/USD";$("rateMsg").textContent="Kurs pasar otomatis";$("sellRate").textContent=idr(round(market*(1-Number(settings.sell_margin))))}catch(e){$("marketRate").textContent="Gagal memuat";$("rateMsg").textContent="Kurs dapat dimasukkan manual saat transaksi";}}
+async function rates(){try{let r=await fetch("https://api.exchangerate.fun/latest?base=USD",{cache:"no-store"}),j=await r.json();market=Number(j.rates?.[settings.base_currency]);if(!market)throw Error();$("marketRate").textContent=idr(market)+"/USD";$("rateMsg").textContent="Kurs pasar otomatis";$("sellRate").textContent=idr(Math.floor(market*(1-Number(settings.sell_margin))/Number(settings.rounding_unit||100))*Number(settings.rounding_unit||100))}catch(e){$("marketRate").textContent="Gagal memuat";$("rateMsg").textContent="Kurs dapat dimasukkan manual saat transaksi";}}
 function modal(t,b){$("modalTitle").textContent=t;$("modalBody").innerHTML=b;$("modalMsg").textContent="";$("modalMsg").className="status";$("modal").classList.remove("hidden")}$("close").onclick=()=>$("modal").classList.add("hidden");
 $("capitalBtn").onclick=()=>{
   modal("Modal awal / tambah modal",'<div class=field><label>IDR</label><input id=a inputmode=decimal autocomplete=off></div><div class=field><label>USD</label><input id=u inputmode=decimal autocomplete=off></div><button id=go class=primary>Simpan modal</button>');
@@ -120,7 +120,7 @@ $("buyBtn").onclick=()=>{
   }
 };
 $("sellBtn").onclick=()=>{
-  modal("Customer jual USD",'<p class=muted>Customer memberikan USD, menerima IDR.</p><div class=field><label>Jumlah USD</label><input id=u inputmode=decimal autocomplete=off></div><div class=field><label>Kurs pasar USD/IDR</label><input id=r inputmode=decimal value="'+(market||"")+'"></div><div class=field><label>Nama customer (opsional)</label><input id=n></div><button id=go class=primary>Proses</button>');
+  modal("Customer jual USD",'<p class=muted>Customer memberikan USD, menerima IDR.</p><div class=field><label>Jumlah USD</label><input id=u inputmode=decimal autocomplete=off></div><div class=field><label>Kurs pasar USD/IDR</label><input id=r inputmode=decimal value="'+(market?Math.round(market):"")+'"></div><div class=field><label>Nama customer (opsional)</label><input id=n></div><button id=go class=primary>Proses</button>');
   bindAmountInput("u");
   $("go").onclick=async()=>{
     let {data,error}=await sb.rpc("mc_customer_sell",{p_trade_amount:rawNumber($("u").value),p_market_rate:rawNumber($("r").value),p_customer_name:$("n").value||null});
@@ -145,7 +145,7 @@ function currentBuyRate(){
   const basis=Number(balance?.trade_amount)>0?Number(balance.base_amount)/Number(balance.trade_amount):0;
   return basis?round(basis*(1+Number(settings.buy_margin))):0;
 }
-function currentSellRate(){ return market?round(market*(1-Number(settings.sell_margin))):0; }
+function currentSellRate(){ return market?Math.floor(market*(1-Number(settings.sell_margin))/Number(settings.rounding_unit||100))*Number(settings.rounding_unit||100):0; }
 $("shareBuyBtn").onclick=()=>{
   const text=`HARGA BELI\n\nKURS/RATE: ${idr(currentBuyRate())} / USD\n\nNAMA BANK: ${settings.bank_name||"-"}\nNOMOR REKENING: ${settings.bank_account_number||"-"}\nNAMA REKENING: ${settings.bank_account_name||"-"}`;
   shareText("Harga Beli USD",text);
