@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 const {createClient}=supabase, sb=createClient(MC_CONFIG.SUPABASE_URL,MC_CONFIG.SUPABASE_PUBLISHABLE_KEY);let user,settings,balance,market=0;
 const $=x=>document.getElementById(x), idr=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(n)||0), num=n=>new Intl.NumberFormat("id-ID",{maximumFractionDigits:2}).format(Number(n)||0);
 const typ=t=>({ADD_CAPITAL:"Tambah modal",INITIAL_CAPITAL:"Modal awal",CUSTOMER_BUY:"Customer beli USD",CUSTOMER_SELL:"Customer jual USD"}[t]||t);
-const round=x=>Math.round(x/Number(settings.rounding_unit||100))*Number(settings.rounding_unit||100);
+const round=x=>Math.floor(x/Number(settings.rounding_unit||100))*Number(settings.rounding_unit||100);
 const formatInput=n=>{
   const s=String(n??"").replace(/[^0-9,.-]/g,"");
   if(!s)return "";
