@@ -26,11 +26,11 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 }
 </style></head>
 <body>
-<header><div class="head"><div><h1>MONEY CHANGER</h1><div class="muted">Cepat • Aman • Terpercaya</div></div><button id="logout" class="hidden">Keluar</button></div></header>
+<header><div class="head"><div><h1>MONEY CHANGER</h1></div><button id="logout" class="hidden">Keluar</button></div></header>
 <main>
 <section id="login" class="panel"><h2>Masuk</h2><div class="field"><label>Email</label><input id="email" type="email"></div><div class="field"><label>Password</label><input id="password" type="password"></div><div class="actions"><button id="loginBtn" class="primary">Masuk</button><button id="signupBtn">Buat akun</button></div><div id="loginMsg" class="status"></div></section>
 <section id="app" class="hidden">
-<div class="grid"><div class="card"><div class="label">Total IDR <span class="icon">💴</span></div><div id="baseBal" class="big">Rp0</div></div><div class="card"><div class="label">Total USD <span class="icon">💵</span></div><div id="tradeBal" class="big">$0</div></div><div class="card"><div class="label">USD di Tangan <span class="icon">👛</span></div><div id="usdHand" class="big">$0</div></div><div class="card"><div class="label">Total THB <span class="icon">🪙</span></div><div id="thbTotal" class="big">฿0</div></div><div class="card"><div class="label">THB di Tangan <span class="icon">💼</span></div><div id="thbHand" class="big">฿0</div></div><div class="card"><div class="label">Profit Bulan Ini <span class="icon">📈</span></div><div id="profit" class="big">Rp0</div></div><div class="card"><div class="label">Kurs Dasar (IDR → USD) <span class="icon">🧮</span></div><div id="basis" class="big">Rp0/USD</div></div></div>
+<div class="grid"><div class="card"><div class="label">Total IDR <span class="icon">💴</span></div><div id="baseBal" class="big">Rp0</div></div><div class="card"><div class="label">Total USD <span class="icon">💵</span></div><div id="tradeBal" class="big">$0</div></div><div class="card"><div class="label">USD di Tangan <span class="icon">👛</span></div><div id="usdHand" class="big">$0</div></div><div class="card"><div class="label">Profit Bulan Ini <span class="icon">📈</span></div><div id="profit" class="big">Rp0</div></div><div class="card"><div class="label">Kurs Dasar (IDR → USD) <span class="icon">🧮</span></div><div id="basis" class="big">Rp0/USD</div></div></div>
 <div class="panel"><div class="row"><div><div class="label">Kurs otomatis</div><div id="marketRate" class="big">Memuat...</div><div id="rateMsg" class="muted"></div></div><button id="refreshRate">Refresh</button></div><hr style="border-color:#292c2a"><div class="rate-grid"><div><div class="label">💵 USD → KHR</div><div id="localRate" class="big">4.000</div></div><div><div class="label">💵 USD → THB</div><div id="thbRate" class="big">0</div></div><div><div class="label">💵 Kurs beli USD</div><div id="buyRate" class="big">Rp0</div></div><div><div class="label">💸 Kurs jual USD</div><div id="sellRate" class="big">Rp0</div></div></div></div>
 <div class="panel"><div class="actions"><button id="capitalBtn" class="primary">Modal awal / tambah modal</button><button id="buyBtn">Customer beli USD</button><button id="sellBtn">Customer jual USD</button><button id="settingsBtn">Pengaturan</button><button id="resetBtn">Reset / Tutup Bulan</button></div></div><div class="panel"><h3>Bagikan Harga ke Customer</h3><div class="actions share-actions"><button id="shareBuyBtn" class="primary">Bagikan Harga Beli USD</button><button id="shareSellBtn">Bagikan Harga Jual USD</button></div><div class="muted" style="margin-top:8px;font-size:12px">Pilih aplikasi tujuan dari menu bagikan HP.</div></div>
 <div class="panel"><div class="row"><h3>Riwayat Transaksi</h3><button id="reload">Refresh</button></div><div id="history" class="history-list"></div></div><div class="panel"><div class="row"><h3>Profit Bulanan</h3><button id="reloadProfit">Refresh</button></div><div style="overflow:auto"><table><thead><tr><th>Bulan</th><th>Profit</th><th>Ditutup</th></tr></thead><tbody id="profitHistory"></tbody></table></div></div>
@@ -89,7 +89,7 @@ async function hist(){
       </div>
       <div class="history-details">
         <div class="history-detail"><div class="label">USD</div><div class="history-value">${usd}</div></div>
-        <div class="history-detail"><div class="label">IDR</div><div class="history-value">${idrValue}</div></div><div class="history-detail"><div class="label">KHR</div><div class="history-value">${num((Number(x.trade_amount)||0)*(Number(settings.usd_local_rate)||0))}</div></div><div class="history-detail"><div class="label">THB</div><div class="history-value">${num((Number(x.trade_amount)||0)*(Number(settings.usd_thb_rate)||0))}</div></div>
+        <div class="history-detail"><div class="label">IDR</div><div class="history-value">${idrValue}</div></div><div class="history-detail"><div class="label">THB</div><div class="history-value">${num((Number(x.trade_amount)||0)*(Number(settings.usd_thb_rate)||0))}</div></div>
         <div class="history-detail"><div class="label">Kurs</div><div class="history-value">${kurs}</div></div>
       </div>
     </div>`;
@@ -101,19 +101,31 @@ async function profitHistory(){let {data,error}=await sb.from("mc_monthly_profit
 async function rates(){try{let r=await fetch("https://api.exchangerate.dev/v1/latest/USD?symbols="+encodeURIComponent(settings.base_currency),{cache:"no-store"}),j=await r.json();market=Number(j.rates?.[settings.base_currency]);if(!market)throw Error();$("marketRate").textContent=idr(market)+"/USD";$("rateMsg").textContent="Kurs pasar otomatis • diperbarui tiap 60 detik";$("sellRate").textContent=idr(Math.floor(market*(1-Number(settings.sell_margin))/Number(settings.rounding_unit||100))*Number(settings.rounding_unit||100))}catch(e){$("marketRate").textContent="Gagal memuat";$("rateMsg").textContent="Kurs dapat dimasukkan manual saat transaksi";}}
 function modal(t,b){$("modalTitle").textContent=t;$("modalBody").innerHTML=b;$("modalMsg").textContent="";$("modalMsg").className="status";$("modal").classList.remove("hidden")}$("close").onclick=()=>$("modal").classList.add("hidden");
 $("capitalBtn").onclick=()=>{
-  modal("Modal awal / tambah modal",'<div class=field><label>IDR</label><input id=a inputmode=decimal autocomplete=off></div><div class=field><label>USD</label><input id=u inputmode=decimal autocomplete=off></div><div class=field><label>THB cash (informasi kurs USD → THB)</label><input id=h inputmode=decimal autocomplete=off></div><div class="muted">THB hanya dicatat sebagai informasi, tidak dihitung sebagai profit.</div><button id=go class=primary>Simpan modal</button>');
+  modal("Modal awal / tambah modal",'<div class=field><label>IDR</label><input id=a inputmode=decimal autocomplete=off></div><div class=field><label>USD</label><input id=u inputmode=decimal autocomplete=off></div><div class=field><label>THB cash (akumulasi modal USD → THB)</label><input id=h inputmode=decimal autocomplete=off></div><div class="muted">THB dicatat dan diakumulasi sebagai informasi kurs, tidak dihitung sebagai profit.</div><button id=go class=primary>Simpan modal</button>');
   bindAmountInput("a");bindAmountInput("u");bindAmountInput("h");
   $("go").onclick=async()=>{
     let idrAmount=rawNumber($("a").value), usdAmount=rawNumber($("u").value), thbAmount=rawNumber($("h").value);
     if(idrAmount<=0 && usdAmount>0 && thbAmount>0){
-      let {error:thbError}=await sb.from("mc_settings").update({usd_thb_rate:thbAmount/usdAmount,updated_at:new Date().toISOString()}).eq("user_id",user.id);
+      // Akumulasi USD/THB: kurs baru dihitung dari total THB lama + THB baru,
+      // dibagi total USD lama + USD baru. Nilai lama tidak diganti.
+      let oldUsd=Number(balance?.trade_amount)||0;
+      let oldThb=(Number(settings.usd_thb_rate)||0)*oldUsd;
+      let newRate=(oldThb+thbAmount)/(oldUsd+usdAmount);
+      let {error:thbError}=await sb.from("mc_settings").update({usd_thb_rate:newRate,updated_at:new Date().toISOString()}).eq("user_id",user.id);
       if(thbError){$("modalMsg").textContent=thbError.message;$("modalMsg").className="status err";return}
       $("modal").classList.add("hidden");await load();return;
     }
-    if(idrAmount<=0 || usdAmount<=0){$("modalMsg").textContent="Isi IDR dan USD untuk modal IDR → USD, atau kosongkan IDR untuk menyimpan kurs USD → THB saja.";$("modalMsg").className="status err";return}
+    if(idrAmount<=0 || usdAmount<=0){$("modalMsg").textContent="Isi IDR dan USD untuk modal IDR → USD, atau kosongkan IDR untuk menambah catatan USD → THB.";$("modalMsg").className="status err";return}
     let {error}=await sb.rpc("mc_add_capital",{p_base_amount:idrAmount,p_trade_amount:usdAmount});
     if(error){$("modalMsg").textContent=error.message;$("modalMsg").className="status err";return}
-    if(thbAmount>0){let {error:thbError}=await sb.from("mc_settings").update({usd_thb_rate:thbAmount/usdAmount,updated_at:new Date().toISOString()}).eq("user_id",user.id);if(thbError){$("modalMsg").textContent=thbError.message;$("modalMsg").className="status err";return;}}
+    if(thbAmount>0){
+      // Akumulasi kurs THB berdasarkan total lama dan tambahan baru.
+      let oldUsd=Number(balance?.trade_amount)||0;
+      let oldThb=(Number(settings.usd_thb_rate)||0)*oldUsd;
+      let newRate=(oldThb+thbAmount)/(oldUsd+usdAmount);
+      let {error:thbError}=await sb.from("mc_settings").update({usd_thb_rate:newRate,updated_at:new Date().toISOString()}).eq("user_id",user.id);
+      if(thbError){$("modalMsg").textContent=thbError.message;$("modalMsg").className="status err";return;}
+    }
     $("modal").classList.add("hidden");await load();await hist()
   }
 };
