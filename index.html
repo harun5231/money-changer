@@ -7,9 +7,9 @@
 <style>
 *{box-sizing:border-box}body{margin:0;background:#101210;color:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 header{padding:22px 18px;border-bottom:1px solid #292c2a;background:#101210eF;position:sticky;top:0;z-index:5}
-main{max-width:900px;margin:auto;padding:16px}.head{display:flex;justify-content:space-between;align-items:center}
-h1{font-size:25px;margin:0}h2,h3{margin-top:0}.muted{color:#929893}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.card,.panel{background:#181b19;border:1px solid #303330;border-radius:16px;padding:16px;margin-bottom:14px}.label{font-size:12px;color:#9da29e;text-transform:uppercase;letter-spacing:.08em}.big{font-size:21px;font-weight:700;margin-top:7px}
+main{max-width:1100px;margin:auto;padding:16px}.head{display:flex;justify-content:space-between;align-items:center}
+h1{font-size:25px;margin:0}h2,h3{margin-top:0}.muted{color:#929893}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.icon{float:right;font-size:24px;opacity:.9}.section-title{display:flex;align-items:center;gap:8px}.rate-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.card,.panel{background:linear-gradient(145deg,#181b19,#141715);border:1px solid #303330;border-radius:16px;padding:16px;margin-bottom:14px}.label{font-size:12px;color:#9da29e;text-transform:uppercase;letter-spacing:.08em}.big{font-size:21px;font-weight:700;margin-top:7px}
 .row{display:flex;gap:12px;align-items:center;justify-content:space-between}.row>*{flex:1}button,input{font:inherit}button{padding:11px 14px;border-radius:10px;border:1px solid #3c413e;background:#222622;color:#fff;font-weight:600}button.primary{background:#087f4f;border-color:#0a9d63}
 input{width:100%;padding:12px;border-radius:10px;border:1px solid #3c413e;background:#101210;color:#fff}.field{margin:11px 0}.field label{display:block;color:#b6bbb7;font-size:13px;margin-bottom:6px}
 .actions{display:flex;gap:9px;flex-wrap:wrap}.actions button{flex:1;min-width:130px}.status{padding:10px;margin:10px 0;border-radius:10px;background:#141715;color:#b8bdb9;font-size:13px}.err{color:#ff9090}.ok{color:#55d99b}
@@ -17,7 +17,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 .history-list{display:flex;flex-direction:column}.history-item{padding:12px 0;border-bottom:1px solid #292c2a}.history-item:last-child{border-bottom:0}.history-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.history-type{font-weight:700}.history-time{color:#929893;font-size:12px;white-space:nowrap}.history-details{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:9px}.history-detail{min-width:0}.history-detail .label{font-size:10px}.history-value{font-weight:700;margin-top:3px;overflow-wrap:anywhere}.share-actions button{min-width:150px}
 .hidden{display:none!important}.modal{position:fixed;inset:0;background:#0009;z-index:20;display:flex;align-items:flex-end}.modalbox{width:min(620px,100%);max-height:90vh;overflow:auto;background:#181b19;border:1px solid #303330;border-radius:20px 20px 0 0;padding:18px}
 @media(max-width:650px){
-  .grid{grid-template-columns:1fr}.row{flex-direction:column;align-items:stretch}main{padding:12px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}.rate-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.row{flex-direction:column;align-items:stretch}main{padding:12px}
   .history-details{grid-template-columns:repeat(2,1fr);gap:7px}
   .history-item{padding:13px 2px}
   .history-top{gap:8px}.history-time{font-size:11px}
@@ -30,8 +30,8 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 <main>
 <section id="login" class="panel"><h2>Masuk</h2><div class="field"><label>Email</label><input id="email" type="email"></div><div class="field"><label>Password</label><input id="password" type="password"></div><div class="actions"><button id="loginBtn" class="primary">Masuk</button><button id="signupBtn">Buat akun</button></div><div id="loginMsg" class="status"></div></section>
 <section id="app" class="hidden">
-<div class="grid"><div class="card"><div class="label">Total IDR</div><div id="baseBal" class="big">Rp0</div></div><div class="card"><div class="label">Total USD</div><div id="tradeBal" class="big">$0</div></div><div class="card"><div class="label">USD di Tangan</div><div id="usdHand" class="big">$0</div></div><div class="card"><div class="label">Profit Bulan Ini</div><div id="profit" class="big">Rp0</div></div><div class="card"><div class="label">Kurs Dasar</div><div id="basis" class="big">Rp0/USD</div></div></div>
-<div class="panel"><div class="row"><div><div class="label">Kurs otomatis</div><div id="marketRate" class="big">Memuat...</div><div id="rateMsg" class="muted"></div></div><button id="refreshRate">Refresh</button></div><hr style="border-color:#292c2a"><div class="grid"><div><div class="label">💵 USD → KHR</div><div id="localRate" class="big">4.000</div></div><div><div class="label">💵 USD → THB</div><div id="thbRate" class="big">0</div></div><div><div class="label">💵 Kurs beli USD</div><div id="buyRate" class="big">Rp0</div></div><div><div class="label">💸 Kurs jual USD</div><div id="sellRate" class="big">Rp0</div></div></div></div>
+<div class="grid"><div class="card"><div class="label">Total IDR <span class="icon">💴</span></div><div id="baseBal" class="big">Rp0</div></div><div class="card"><div class="label">Total USD <span class="icon">💵</span></div><div id="tradeBal" class="big">$0</div></div><div class="card"><div class="label">USD di Tangan <span class="icon">👛</span></div><div id="usdHand" class="big">$0</div></div><div class="card"><div class="label">Total THB <span class="icon">🪙</span></div><div id="thbTotal" class="big">฿0</div></div><div class="card"><div class="label">THB di Tangan <span class="icon">💼</span></div><div id="thbHand" class="big">฿0</div></div><div class="card"><div class="label">Profit Bulan Ini <span class="icon">📈</span></div><div id="profit" class="big">Rp0</div></div><div class="card"><div class="label">Kurs Dasar (IDR → USD) <span class="icon">🧮</span></div><div id="basis" class="big">Rp0/USD</div></div></div>
+<div class="panel"><div class="row"><div><div class="label">Kurs otomatis</div><div id="marketRate" class="big">Memuat...</div><div id="rateMsg" class="muted"></div></div><button id="refreshRate">Refresh</button></div><hr style="border-color:#292c2a"><div class="rate-grid"><div><div class="label">💵 USD → KHR</div><div id="localRate" class="big">4.000</div></div><div><div class="label">💵 USD → THB</div><div id="thbRate" class="big">0</div></div><div><div class="label">💵 Kurs beli USD</div><div id="buyRate" class="big">Rp0</div></div><div><div class="label">💸 Kurs jual USD</div><div id="sellRate" class="big">Rp0</div></div></div></div>
 <div class="panel"><div class="actions"><button id="capitalBtn" class="primary">Modal awal / tambah modal</button><button id="buyBtn">Customer beli USD</button><button id="sellBtn">Customer jual USD</button><button id="settingsBtn">Pengaturan</button><button id="resetBtn">Reset / Tutup Bulan</button></div></div><div class="panel"><h3>Bagikan Harga ke Customer</h3><div class="actions share-actions"><button id="shareBuyBtn" class="primary">Bagikan Harga Beli USD</button><button id="shareSellBtn">Bagikan Harga Jual USD</button></div><div class="muted" style="margin-top:8px;font-size:12px">Pilih aplikasi tujuan dari menu bagikan HP.</div></div>
 <div class="panel"><div class="row"><h3>Riwayat Transaksi</h3><button id="reload">Refresh</button></div><div id="history" class="history-list"></div></div><div class="panel"><div class="row"><h3>Profit Bulanan</h3><button id="reloadProfit">Refresh</button></div><div style="overflow:auto"><table><thead><tr><th>Bulan</th><th>Profit</th><th>Ditutup</th></tr></thead><tbody id="profitHistory"></tbody></table></div></div>
 </section></main>
@@ -105,9 +105,15 @@ $("capitalBtn").onclick=()=>{
   bindAmountInput("a");bindAmountInput("u");bindAmountInput("h");
   $("go").onclick=async()=>{
     let idrAmount=rawNumber($("a").value), usdAmount=rawNumber($("u").value), thbAmount=rawNumber($("h").value);
+    if(idrAmount<=0 && usdAmount>0 && thbAmount>0){
+      let {error:thbError}=await sb.from("mc_settings").update({usd_thb_rate:thbAmount/usdAmount,updated_at:new Date().toISOString()}).eq("user_id",user.id);
+      if(thbError){$("modalMsg").textContent=thbError.message;$("modalMsg").className="status err";return}
+      $("modal").classList.add("hidden");await load();return;
+    }
+    if(idrAmount<=0 || usdAmount<=0){$("modalMsg").textContent="Isi IDR dan USD untuk modal IDR → USD, atau kosongkan IDR untuk menyimpan kurs USD → THB saja.";$("modalMsg").className="status err";return}
     let {error}=await sb.rpc("mc_add_capital",{p_base_amount:idrAmount,p_trade_amount:usdAmount});
     if(error){$("modalMsg").textContent=error.message;$("modalMsg").className="status err";return}
-    if(usdAmount>0 && thbAmount>0){let {error:thbError}=await sb.from("mc_settings").update({usd_thb_rate:thbAmount/usdAmount,updated_at:new Date().toISOString()}).eq("user_id",user.id);if(thbError){$("modalMsg").textContent=thbError.message;$("modalMsg").className="status err";return;}}
+    if(thbAmount>0){let {error:thbError}=await sb.from("mc_settings").update({usd_thb_rate:thbAmount/usdAmount,updated_at:new Date().toISOString()}).eq("user_id",user.id);if(thbError){$("modalMsg").textContent=thbError.message;$("modalMsg").className="status err";return;}}
     $("modal").classList.add("hidden");await load();await hist()
   }
 };
