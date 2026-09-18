@@ -64,17 +64,35 @@ async function load(){let s=await sb.from("mc_settings").select("*").single(),b=
 const ACC_KEY="mc_thb_accumulation_history";
 function accRows(){try{return JSON.parse(localStorage.getItem(ACC_KEY)||"[]")}catch(e){return[]}}
 function saveAccRows(rows){localStorage.setItem(ACC_KEY,JSON.stringify(rows))}
+function thbRound(v){return Math.round((Number(v)||0)*10)/10}
+function thbText(v){return thbRound(v).toFixed(2)}
+function recomputeAccumRate(rows){
+  if(!rows.length)return 0;
+  const sorted=[...rows].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+  let fallbackUsd=Number(balance?.trade_amount)||0;
+  let usd=Number(sorted[0].oldUsd);
+  let thb=Number(sorted[0].oldThb);
+  if(!Number.isFinite(usd))usd=fallbackUsd;
+  if(!Number.isFinite(thb))thb=(Number(sorted[0].oldRate)||0)*fallbackUsd;
+  for(const x of sorted){
+    if(x!==sorted[0] || x.includeFirst){usd+=Number(x.usd_amount)||0;thb+=Number(x.thb_amount)||0;}
+  }
+  return usd>0?thb/usd:0;
+}
 async function cancelTransaction(id){
   if(!id)return;
-  if(!confirm("Batalkan transaksi ini?"))return;
-  const local=accRows().find(x=>x.id===id);
+  if(!confirm("Batalkan transaksi ini? Saldo/kurs akan dikoreksi ke kondisi sebelum transaksi."))return;
+  const all=accRows();
+  const local=all.find(x=>x.id===id);
   if(local){
-    const {error}=await sb.from("mc_settings").update({usd_thb_rate:local.oldRate,updated_at:new Date().toISOString()}).eq("user_id",user.id);
+    const remaining=all.filter(x=>x.id!==id);
+    const newRate=remaining.length?recomputeAccumRate(remaining):Number(local.oldRate)||0;
+    const {error}=await sb.from("mc_settings").update({usd_thb_rate:newRate,updated_at:new Date().toISOString()}).eq("user_id",user.id);
     if(error){alert(error.message);return}
-    saveAccRows(accRows().filter(x=>x.id!==id));
+    saveAccRows(remaining);
   }else{
     const {error}=await sb.rpc("mc_cancel_transaction",{p_transaction_id:id});
-    if(error){alert(error.message);return}
+    if(error){alert("Batalkan gagal: "+error.message+". Pastikan fungsi mc_cancel_transaction sudah dibuat di Supabase.");return}
   }
   await load();await hist();
 }
@@ -88,10 +106,11 @@ async function hist(){
   if(!rows.length){box.innerHTML='<div class="muted">Belum ada transaksi</div>';return;}
   box.innerHTML=rows.map(x=>{
     const rate=Number(x.customer_rate)||0;
-    const shownIdr=x.transaction_type==="CUSTOMER_BUY"&&rate?Math.abs(Number(x.trade_amount)||0)*rate:Number(x.base_amount)||0;
-    const usd=num(x.trade_amount),idrValue=idr(shownIdr),kurs=rate?idr(rate):"-";
+    const isAcc=x.transaction_type==="USD_THB_ACCUMULATE";
+    const shownIdr=isAcc?0:(x.transaction_type==="CUSTOMER_BUY"&&rate?Math.abs(Number(x.trade_amount)||0)*rate:Number(x.base_amount)||0);
+    const usd=num(x.trade_amount),idrValue=idr(shownIdr),kurs=isAcc?"0":(rate?idr(rate):"-");
     const time=new Date(x.created_at).toLocaleString("id-ID",{day:"numeric",month:"numeric",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"});
-    return `<div class="history-item"><div class="history-top"><div class="history-type">${typ(x.transaction_type)}${x.customer_name?`<div class="muted" style="font-size:12px;margin-top:4px">Nama: ${x.customer_name}</div>`:""}</div><div class="history-time">${time}</div></div><div class="history-details"><div class="history-detail"><div class="label">USD</div><div class="history-value">${usd}</div></div><div class="history-detail"><div class="label">IDR</div><div class="history-value">${idrValue}</div></div><div class="history-detail"><div class="label">THB</div><div class="history-value">${num((Number(x.trade_amount)||0)*(Number(settings.usd_thb_rate)||0))}</div></div><div class="history-detail"><div class="label">Kurs</div><div class="history-value">${kurs}</div></div></div><button class="cancel-history" onclick="cancelTransaction('${x._local?x.id:x.id}')">Batalkan</button></div>`;
+    return `<div class="history-item"><div class="history-top"><div class="history-type">${typ(x.transaction_type)}${x.customer_name?`<div class="muted" style="font-size:12px;margin-top:4px">Nama: ${x.customer_name}</div>`:""}</div><div class="history-time">${time}</div></div><div class="history-details"><div class="history-detail"><div class="label">USD</div><div class="history-value">${usd}</div></div><div class="history-detail"><div class="label">IDR</div><div class="history-value">${idrValue}</div></div><div class="history-detail"><div class="label">THB</div><div class="history-value">${isAcc?thbText(x.thb_amount):num((Number(x.trade_amount)||0)*(Number(settings.usd_thb_rate)||0))}</div></div><div class="history-detail"><div class="label">Kurs</div><div class="history-value">${kurs}</div></div></div><button class="cancel-history" onclick="cancelTransaction('${x._local?x.id:x.id}')">Batalkan</button></div>`;
   }).join("");
 }
 
@@ -109,10 +128,10 @@ $("capitalBtn").onclick=()=>{
       // dibagi total USD lama + USD baru. Nilai lama tidak diganti.
       let oldUsd=Number(balance?.trade_amount)||0;
       let oldThb=(Number(settings.usd_thb_rate)||0)*oldUsd;
-      let newRate=(oldThb+thbAmount)/(oldUsd+usdAmount);
+      let newRate=thbRound((oldThb+thbAmount)/(oldUsd+usdAmount));
       let {error:thbError}=await sb.from("mc_settings").update({usd_thb_rate:newRate,updated_at:new Date().toISOString()}).eq("user_id",user.id);
       if(thbError){$("modalMsg").textContent=thbError.message;$("modalMsg").className="status err";return}
-      const acc=accRows();acc.push({id:"acc_"+Date.now()+"_"+Math.random().toString(36).slice(2),created_at:new Date().toISOString(),usd_amount:usdAmount,thb_amount:thbAmount,oldRate:Number(settings.usd_thb_rate)||0,newRate});saveAccRows(acc);
+      const acc=accRows();acc.push({id:"acc_"+Date.now()+"_"+Math.random().toString(36).slice(2),created_at:new Date().toISOString(),usd_amount:usdAmount,thb_amount:thbAmount,oldUsd,oldThb,oldRate:Number(settings.usd_thb_rate)||0,newRate});saveAccRows(acc);
       $("modal").classList.add("hidden");await load();await hist();return;
     }
     if(idrAmount<=0 || usdAmount<=0){$("modalMsg").textContent="Isi IDR dan USD untuk modal IDR → USD, atau kosongkan IDR untuk menambah catatan USD → THB.";$("modalMsg").className="status err";return}
@@ -122,7 +141,7 @@ $("capitalBtn").onclick=()=>{
       // Akumulasi kurs THB berdasarkan total lama dan tambahan baru.
       let oldUsd=Number(balance?.trade_amount)||0;
       let oldThb=(Number(settings.usd_thb_rate)||0)*oldUsd;
-      let newRate=(oldThb+thbAmount)/(oldUsd+usdAmount);
+      let newRate=thbRound((oldThb+thbAmount)/(oldUsd+usdAmount));
       let {error:thbError}=await sb.from("mc_settings").update({usd_thb_rate:newRate,updated_at:new Date().toISOString()}).eq("user_id",user.id);
       if(thbError){$("modalMsg").textContent=thbError.message;$("modalMsg").className="status err";return;}
     }
@@ -133,9 +152,10 @@ $("buyBtn").onclick=()=>{
   modal("Customer beli USD",'<p class=muted>Customer memberikan IDR, menerima USD.</p><div class=field><label>Jumlah USD</label><input id=u inputmode=decimal autocomplete=off></div><div class=field><label>Nama customer (opsional)</label><input id=n></div><button id=go class=primary>Proses</button>');
   bindAmountInput("u");
   $("go").onclick=async()=>{
+    const fallbackRate=currentBuyRate();
     let {data,error}=await sb.rpc("mc_customer_buy",{p_trade_amount:rawNumber($("u").value),p_customer_name:$("n").value||null});
     if(error){$("modalMsg").textContent=error.message;$("modalMsg").className="status err";return}
-    $("modalMsg").textContent="Berhasil. Kurs "+idr(data.rate);$("modalMsg").className="status ok";await load();await hist()
+    $("modalMsg").textContent="Berhasil. Kurs "+idr((data&&data.rate)||fallbackRate);$("modalMsg").className="status ok";await load();await hist()
   }
 };
 $("sellBtn").onclick=()=>{
@@ -163,7 +183,7 @@ $("shareBuyBtn").onclick=()=>{
   shareText("Harga Beli USD",text);
 };
 $("shareSellBtn").onclick=()=>{
-  const text=`HARGA JUAL USD\n\nKURS/RATE : ${idr(currentSellRate())} = ${num(settings.usd_thb_rate||0)} BAHT\n\nNama Bank : ${settings.bank_name||"-"}\nNomor Rekening : ${settings.bank_account_number||"-"}\nNama Rekening : ${settings.bank_account_name||"-"}`;
+  const text=`HARGA JUAL USD\n\nKURS/RATE : ${idr(currentSellRate())} = ${thbText(settings.usd_thb_rate||0)} BAHT`;
   shareText("Harga Jual USD",text);
 };
 $("loginBtn").onclick=async()=>{let {data,error}=await sb.auth.signInWithPassword({email:$("email").value,password:$("password").value});$("loginMsg").textContent=error?error.message:"Berhasil masuk";if(!error)start(data.user)};
