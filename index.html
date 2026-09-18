@@ -15,7 +15,7 @@ input{width:100%;padding:12px;border-radius:10px;border:1px solid #3c413e;backgr
 .actions{display:flex;gap:9px;flex-wrap:wrap}.actions button{flex:1;min-width:130px}.status{padding:10px;margin:10px 0;border-radius:10px;background:#141715;color:#b8bdb9;font-size:13px}.err{color:#ff9090}.ok{color:#55d99b}
 table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:10px 6px;border-bottom:1px solid #292c2a}th{color:#929893;font-weight:500}
 .history-list{display:flex;flex-direction:column}.history-item{padding:12px 0;border-bottom:1px solid #292c2a}.history-item:last-child{border-bottom:0}.history-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.history-type{font-weight:700}.history-time{color:#929893;font-size:12px;white-space:nowrap}.history-details{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:9px}.history-detail{min-width:0}.history-detail .label{font-size:10px}.history-value{font-weight:700;margin-top:3px;overflow-wrap:anywhere}.share-actions button{min-width:150px}
-.hidden{display:none!important}.modal{position:fixed;inset:0;background:#0009;z-index:20;display:flex;align-items:flex-end}.modalbox{width:min(620px,100%);max-height:90vh;overflow:auto;background:#181b19;border:1px solid #303330;border-radius:20px 20px 0 0;padding:18px}
+.cancel-history{margin-top:10px;background:#7f1d1d;border-color:#991b1b;width:100%}.hidden{display:none!important}.modal{position:fixed;inset:0;background:#0009;z-index:20;display:flex;align-items:flex-end}.modalbox{width:min(620px,100%);max-height:90vh;overflow:auto;background:#181b19;border:1px solid #303330;border-radius:20px 20px 0 0;padding:18px}
 @media(max-width:650px){
   .grid{grid-template-columns:repeat(2,minmax(0,1fr))}.rate-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.row{flex-direction:column;align-items:stretch}main{padding:12px}
   .history-details{grid-template-columns:repeat(2,1fr);gap:7px}
@@ -61,38 +61,37 @@ const bindAmountInput=id=>{
   el.addEventListener("blur",()=>{el.value=formatInput(el.value)});
 };
 async function load(){let s=await sb.from("mc_settings").select("*").single(),b=await sb.from("mc_balances").select("*").single();if(s.error||b.error)throw Error((s.error||b.error).message);settings=s.data;balance=b.data;let basis=Number(balance.trade_amount)>0?Number(balance.base_amount)/Number(balance.trade_amount):0;$("baseBal").textContent=idr(balance.base_amount);$("tradeBal").textContent="$"+num(balance.trade_amount);$("usdHand").textContent="$"+num(balance.usd_in_hand);$("profit").textContent=idr(balance.profit_month_idr);$("basis").textContent=idr(basis)+"/USD";$("localRate").textContent=num(settings.usd_local_rate);$("thbRate").textContent=num(settings.usd_thb_rate||0);$("buyRate").textContent=basis?idr(round(basis*(1+Number(settings.buy_margin)) )):"Rp0";if(market)$("sellRate").textContent=idr(round(market*(1-Number(settings.sell_margin))));}
+const ACC_KEY="mc_thb_accumulation_history";
+function accRows(){try{return JSON.parse(localStorage.getItem(ACC_KEY)||"[]")}catch(e){return[]}}
+function saveAccRows(rows){localStorage.setItem(ACC_KEY,JSON.stringify(rows))}
+async function cancelTransaction(id){
+  if(!id)return;
+  if(!confirm("Batalkan transaksi ini?"))return;
+  const local=accRows().find(x=>x.id===id);
+  if(local){
+    const {error}=await sb.from("mc_settings").update({usd_thb_rate:local.oldRate,updated_at:new Date().toISOString()}).eq("user_id",user.id);
+    if(error){alert(error.message);return}
+    saveAccRows(accRows().filter(x=>x.id!==id));
+  }else{
+    const {error}=await sb.rpc("mc_cancel_transaction",{p_transaction_id:id});
+    if(error){alert(error.message);return}
+  }
+  await load();await hist();
+}
 async function hist(){
   let {data,error}=await sb.from("mc_transactions").select("*").order("created_at",{ascending:false}).limit(50);
   const box=$("history");
-  if(error){
-    box.innerHTML=`<div class="status err">${error.message}</div>`;
-    return;
-  }
-  const rows=data||[];
-  if(!rows.length){
-    box.innerHTML='<div class="muted">Belum ada transaksi</div>';
-    return;
-  }
+  if(error){box.innerHTML=`<div class="status err">${error.message}</div>`;return;}
+  const dbRows=(data||[]).map(x=>({...x,_local:false}));
+  const localRows=accRows().map(x=>({...x,_local:true,transaction_type:"USD_THB_ACCUMULATE",created_at:x.created_at,trade_amount:x.usd_amount,base_amount:0,customer_rate:x.newRate}));
+  const rows=[...dbRows,...localRows].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  if(!rows.length){box.innerHTML='<div class="muted">Belum ada transaksi</div>';return;}
   box.innerHTML=rows.map(x=>{
     const rate=Number(x.customer_rate)||0;
-    const shownIdr=x.transaction_type==="CUSTOMER_BUY"&&rate
-      ?Math.abs(Number(x.trade_amount)||0)*rate
-      :Number(x.base_amount)||0;
-    const usd=num(x.trade_amount);
-    const idrValue=idr(shownIdr);
-    const kurs=rate?idr(rate):"-";
+    const shownIdr=x.transaction_type==="CUSTOMER_BUY"&&rate?Math.abs(Number(x.trade_amount)||0)*rate:Number(x.base_amount)||0;
+    const usd=num(x.trade_amount),idrValue=idr(shownIdr),kurs=rate?idr(rate):"-";
     const time=new Date(x.created_at).toLocaleString("id-ID",{day:"numeric",month:"numeric",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"});
-    return `<div class="history-item">
-      <div class="history-top">
-        <div class="history-type">${typ(x.transaction_type)}${x.customer_name?`<div class="muted" style="font-size:12px;margin-top:4px">Nama: ${x.customer_name}</div>`:""}</div>
-        <div class="history-time">${time}</div>
-      </div>
-      <div class="history-details">
-        <div class="history-detail"><div class="label">USD</div><div class="history-value">${usd}</div></div>
-        <div class="history-detail"><div class="label">IDR</div><div class="history-value">${idrValue}</div></div><div class="history-detail"><div class="label">THB</div><div class="history-value">${num((Number(x.trade_amount)||0)*(Number(settings.usd_thb_rate)||0))}</div></div>
-        <div class="history-detail"><div class="label">Kurs</div><div class="history-value">${kurs}</div></div>
-      </div>
-    </div>`;
+    return `<div class="history-item"><div class="history-top"><div class="history-type">${typ(x.transaction_type)}${x.customer_name?`<div class="muted" style="font-size:12px;margin-top:4px">Nama: ${x.customer_name}</div>`:""}</div><div class="history-time">${time}</div></div><div class="history-details"><div class="history-detail"><div class="label">USD</div><div class="history-value">${usd}</div></div><div class="history-detail"><div class="label">IDR</div><div class="history-value">${idrValue}</div></div><div class="history-detail"><div class="label">THB</div><div class="history-value">${num((Number(x.trade_amount)||0)*(Number(settings.usd_thb_rate)||0))}</div></div><div class="history-detail"><div class="label">Kurs</div><div class="history-value">${kurs}</div></div></div><button class="cancel-history" onclick="cancelTransaction('${x._local?x.id:x.id}')">Batalkan</button></div>`;
   }).join("");
 }
 
@@ -113,7 +112,8 @@ $("capitalBtn").onclick=()=>{
       let newRate=(oldThb+thbAmount)/(oldUsd+usdAmount);
       let {error:thbError}=await sb.from("mc_settings").update({usd_thb_rate:newRate,updated_at:new Date().toISOString()}).eq("user_id",user.id);
       if(thbError){$("modalMsg").textContent=thbError.message;$("modalMsg").className="status err";return}
-      $("modal").classList.add("hidden");await load();return;
+      const acc=accRows();acc.push({id:"acc_"+Date.now()+"_"+Math.random().toString(36).slice(2),created_at:new Date().toISOString(),usd_amount:usdAmount,thb_amount:thbAmount,oldRate:Number(settings.usd_thb_rate)||0,newRate});saveAccRows(acc);
+      $("modal").classList.add("hidden");await load();await hist();return;
     }
     if(idrAmount<=0 || usdAmount<=0){$("modalMsg").textContent="Isi IDR dan USD untuk modal IDR → USD, atau kosongkan IDR untuk menambah catatan USD → THB.";$("modalMsg").className="status err";return}
     let {error}=await sb.rpc("mc_add_capital",{p_base_amount:idrAmount,p_trade_amount:usdAmount});
