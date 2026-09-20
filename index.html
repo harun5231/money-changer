@@ -29,6 +29,32 @@ main{max-width:1000px;padding:10px 22px 24px}.panel,.card{background:linear-grad
 @media(max-width:700px){header{padding:12px 18px 10px}.brand-mark{font-size:37px}h1{font-size:21px}.head-right{gap:10px}.datebox{font-size:12px}.datebox strong{font-size:19px}.avatar{width:47px;height:47px;font-size:18px}main{padding:7px 18px 18px}.rate-card.rate-buy,.rate-card.rate-sell{min-height:118px;padding:15px}.rate-card.rate-buy .big,.rate-card.rate-sell .big{font-size:28px}.rate-icon{width:58px;height:58px;font-size:34px;margin-right:15px}.subline{font-size:12px}.rate-card.small{min-height:100px;padding:13px}.rate-card.small .big{font-size:22px}.rate-card.small .rate-icon{width:48px;height:48px;font-size:27px;margin-right:12px}.refresh{min-width:0;padding:9px 13px!important;font-size:12px!important}.thb-card{max-width:100%}.money-grid{gap:8px}.money-card{padding:12px;min-height:91px}.money-card .big{font-size:18px}.label{font-size:10px}.action{min-height:64px;font-size:15px;padding:9px}.action .ico{width:44px;height:44px;font-size:24px}.capital-action{min-height:68px}.share-actions{gap:8px}.share-actions .action{font-size:13px}.shortcut-grid{grid-template-columns:repeat(2,1fr);gap:8px}.shortcut{min-height:116px;font-size:13px;padding:10px}.shortcut .ico{width:46px;height:46px;font-size:22px}.shortcut .txt small{font-size:9px}.shortcut:after{right:8px;bottom:8px;font-size:21px}}
 @media(max-width:390px){main{padding-left:10px;padding-right:10px}.money-card .big{font-size:16px}.rate-card.rate-buy .big,.rate-card.rate-sell .big{font-size:24px}}
 </style></style>
+
+<style id="final-size-fix">
+/* FINAL MOBILE SIZE FIX — visual only, no business logic changed */
+.rate-card.rate-buy,.rate-card.rate-sell{padding:14px 15px;min-height:138px;display:flex;align-items:center;gap:14px}
+.rate-card.rate-buy .rate-icon,.rate-card.rate-sell .rate-icon{float:none;flex:0 0 68px;width:68px;height:68px;margin:0;font-size:36px}
+.rate-card.rate-buy > div:not(.rate-icon),.rate-card.rate-sell > div:not(.rate-icon){min-width:0}
+.rate-card.rate-buy .big,.rate-card.rate-sell .big{font-size:clamp(23px,4.2vw,31px);letter-spacing:-.035em;line-height:1.05;white-space:nowrap;overflow:visible;text-overflow:clip}
+.rate-card.small{min-height:104px;padding:13px}
+.rate-card.small .rate-icon{width:54px;height:54px;flex-basis:54px;font-size:30px;margin:0 12px 0 0}
+.rate-card.small .big{font-size:clamp(20px,3.5vw,27px);letter-spacing:-.025em}
+.thb-card{max-width:100%;display:block;padding:13px 16px}.thb-card .thb-icon{float:left;margin-right:14px}.thb-card .big{font-size:clamp(22px,3.8vw,29px);line-height:1.05}
+.money-card{min-height:108px;padding:13px 12px}.money-card .big{font-size:clamp(17px,2.8vw,22px);letter-spacing:-.025em;line-height:1.05}
+.money-card .label{font-size:8px;line-height:1.15}
+.action{font-size:16px;min-height:70px;padding:11px 12px}.action .ico{width:48px;height:48px;font-size:27px}
+.capital-action{min-height:72px}
+.share-actions .action{min-height:66px;font-size:15px}
+.shortcut{min-height:142px;font-size:15px;padding:12px}.shortcut .txt small{font-size:9px}
+header{padding:11px 18px 9px}.brand-mark{font-size:38px}.head h1{font-size:25px}.datebox{font-size:12px}.datebox strong{font-size:19px}.avatar{width:48px;height:48px;font-size:18px}.head-right{gap:11px}
+@media(max-width:650px){
+ main{padding:8px 10px 18px}.rate-grid{gap:8px}.rate-card.rate-buy,.rate-card.rate-sell{min-height:126px;padding:12px;gap:10px}.rate-card.rate-buy .rate-icon,.rate-card.rate-sell .rate-icon{flex-basis:58px;width:58px;height:58px;font-size:31px}.rate-card.rate-buy .big,.rate-card.rate-sell .big{font-size:clamp(21px,6vw,28px)}.subline{font-size:13px}.label{font-size:8px}.rate-card.small{min-height:98px}.rate-card.small .big{font-size:clamp(18px,5vw,24px)}.money-grid{gap:6px}.money-card{min-height:96px;padding:11px 9px}.money-card .big{font-size:clamp(15px,4.5vw,19px)}.money-card .label{font-size:7.5px}.action{font-size:14px;min-height:62px}.action .ico{width:43px;height:43px;font-size:24px}.capital-action{min-height:66px}.share-actions .action{font-size:13px;min-height:58px}.shortcut{min-height:122px;font-size:13px}.shortcut .txt small{font-size:8px}
+}
+@media(max-width:520px){
+ .head h1{font-size:20px}.brand-mark{font-size:31px}.datebox{display:none}.avatar{width:42px;height:42px;font-size:16px}.rate-grid{grid-template-columns:1fr 1fr}.rate-card.rate-buy,.rate-card.rate-sell{min-height:118px}.rate-card.rate-buy .rate-icon,.rate-card.rate-sell .rate-icon{flex-basis:50px;width:50px;height:50px;font-size:27px}.rate-card.rate-buy .big,.rate-card.rate-sell .big{font-size:22px}.money-card .big{font-size:15px}.money-card .label{font-size:7px}.shortcut{min-height:112px;font-size:12px}
+}
+@media(max-width:390px){.money-grid{grid-template-columns:repeat(2,1fr)}.money-card .big{font-size:17px}.rate-card.rate-buy .big,.rate-card.rate-sell .big{font-size:20px}}
+</style>
 </head>
 <body>
 <header><div class="head"><div class="brand-mark">↔</div><h1>MONEY CHANGER</h1><div class="head-right"><div class="datebox"><span id="todayDate">18 Sep 2026</span><strong id="todayTime">22:11</strong></div><div class="avatar">HN</div><button id="logout" class="hidden">Keluar</button></div></div></header>
