@@ -77,6 +77,30 @@ button,input{font:inherit}button{padding:9px 11px;border-radius:10px;border:1px 
  .auto-refresh-card .muted{font-size:8px!important;}
  .thb-delete{padding:5px 7px!important;font-size:8px!important;}
 }
+
+/* FINAL HISTORY + SHARE DISPLAY FIX — visual only */
+.history-list{gap:0;width:100%;min-width:0}
+.history-item{padding:13px 0;border-bottom:1px solid #25302b;min-width:0}
+.history-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;min-width:0}
+.history-type{font-weight:800;min-width:0;overflow-wrap:anywhere}
+.history-name{display:block;color:#dce6e1;font-size:12px;font-weight:700;margin-top:3px;overflow-wrap:anywhere}
+.history-time{color:#78857f;font-size:10px;white-space:nowrap;flex:0 0 auto}
+.history-details{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:9px;min-width:0}
+.history-detail{min-width:0}
+.history-detail .label{font-size:8px;color:#89958f;letter-spacing:.06em;text-transform:uppercase}
+.history-value{font-weight:800;margin-top:3px;line-height:1.2;overflow-wrap:anywhere;word-break:break-word;font-size:12px}
+.history-capital .history-details{grid-template-columns:repeat(3,minmax(0,1fr))}
+.history-capital .history-detail:last-child{display:none}
+@media(max-width:480px){
+  .history-item{padding:12px 0}
+  .history-top{gap:8px}
+  .history-type{font-size:13px}
+  .history-name{font-size:11px}
+  .history-time{font-size:9px}
+  .history-details{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 12px}
+  .history-capital .history-details{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .history-value{font-size:13px}
+}
 </style>
 </head>
 <body>
@@ -186,13 +210,16 @@ async function hist(filter="all"){
   if(filter==="customer") rows=rows.filter(x=>x.transaction_type==="CUSTOMER_BUY"||x.transaction_type==="CUSTOMER_SELL");
   if(filter==="capital") rows=rows.filter(x=>x.transaction_type==="ADD_CAPITAL"||x.transaction_type==="INITIAL_CAPITAL");
   if(!rows.length){box.innerHTML='<div class="muted">Belum ada data</div>';return;}
+  const esc=v=>String(v??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
   box.innerHTML=rows.map(x=>{
+    const isCustomer=x.transaction_type==="CUSTOMER_BUY"||x.transaction_type==="CUSTOMER_SELL";
     const rate=Number(x.customer_rate)||0;
     const shownIdr=x.transaction_type==="CUSTOMER_BUY"&&rate?Math.abs(Number(x.trade_amount)||0)*rate:Number(x.base_amount)||0;
     const usd=num(x.trade_amount);const idrValue=idr(shownIdr);const kurs=rate?idr(rate):"-";
-    const thb=(x.transaction_type==="CUSTOMER_BUY"||x.transaction_type==="CUSTOMER_SELL")&&thbRate>0?num(Math.abs(Number(x.trade_amount)||0)*thbRate)+" THB":"-";
+    const thb=isCustomer&&thbRate>0?num(Math.abs(Number(x.trade_amount)||0)*thbRate)+" THB":"-";
     const time=new Date(x.created_at).toLocaleString("id-ID",{day:"numeric",month:"numeric",year:"numeric",hour:"2-digit",minute:"2-digit"});
-    return `<div class="history-item"><div class="history-top"><div class="history-type">${typ(x.transaction_type)}</div><div class="history-time">${time}</div></div><div class="history-details"><div class="history-detail"><div class="label">USD</div><div class="history-value">${usd}</div></div><div class="history-detail"><div class="label">IDR</div><div class="history-value">${idrValue}</div></div><div class="history-detail"><div class="label">Kurs</div><div class="history-value">${kurs}</div></div><div class="history-detail"><div class="label">THB</div><div class="history-value">${thb}</div></div></div></div>`;
+    const name=isCustomer&&x.customer_name?`<div class="history-name">${esc(x.customer_name)}</div>`:"";
+    return `<div class="history-item ${isCustomer?'history-customer':'history-capital'}"><div class="history-top"><div><div class="history-type">${typ(x.transaction_type)}</div>${name}</div><div class="history-time">${time}</div></div><div class="history-details"><div class="history-detail"><div class="label">USD</div><div class="history-value">${usd}</div></div><div class="history-detail"><div class="label">IDR</div><div class="history-value">${idrValue}</div></div><div class="history-detail"><div class="label">Kurs</div><div class="history-value">${kurs}</div></div><div class="history-detail"><div class="label">THB</div><div class="history-value">${thb}</div></div></div></div>`;
   }).join("");
 }
 
@@ -299,11 +326,11 @@ function currentBuyRate(){
 }
 function currentSellRate(){ return market?Math.floor(market*(1-Number(settings.sell_margin))/Number(settings.rounding_unit||100))*Number(settings.rounding_unit||100):0; }
 $("shareBuyBtn").onclick=()=>{
-  const text=`HARGA BELI\n\nKURS/RATE: ${idr(currentBuyRate())} / USD\n\nNAMA BANK: ${settings.bank_name||"-"}\nNOMOR REKENING: ${settings.bank_account_number||"-"}\nNAMA REKENING: ${settings.bank_account_name||"-"}`;
+  const text=`BELI\nRate : ${idr(currentBuyRate())} / Usd = ${thbRate?num(thbRate):"-"} Baht\n\nNAMA BANK: ${settings.bank_name||"-"}\nNOMOR REKENING: ${settings.bank_account_number||"-"}\nNAMA REKENING: ${settings.bank_account_name||"-"}`;
   shareText("Harga Beli USD",text);
 };
 $("shareSellBtn").onclick=()=>{
-  const text=`HARGA JUAL\n\nKURS/RATE: ${idr(currentSellRate())} / USD`;
+  const text=`JUAL\nRate : ${idr(currentSellRate())} / Usd = ${thbRate?num(thbRate):"-"} Baht`;
   shareText("Harga Jual USD",text);
 };
 $("loginBtn").onclick=async()=>{let {data,error}=await sb.auth.signInWithPassword({email:$("email").value,password:$("password").value});$("loginMsg").textContent=error?error.message:"Berhasil masuk";if(!error)start(data.user)};
