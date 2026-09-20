@@ -40,9 +40,10 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 const {createClient}=supabase, sb=createClient(MC_CONFIG.SUPABASE_URL,MC_CONFIG.SUPABASE_PUBLISHABLE_KEY);let user,settings,balance,market=0;
 let thbRate=0;
 const $=x=>document.getElementById(x), idr=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(n)||0), num=n=>new Intl.NumberFormat("id-ID",{maximumFractionDigits:2}).format(Number(n)||0);
-function thbStorageKey(){return user ? "mc_usd_thb_rate_"+user.id : "mc_usd_thb_rate"}
-function loadThbRate(){thbRate=Number(localStorage.getItem(thbStorageKey())||0);$("thbRate").textContent=thbRate?num(thbRate):"0"}
-function saveThbRate(v){thbRate=Number(v)||0;localStorage.setItem(thbStorageKey(),String(thbRate));$("thbRate").textContent=thbRate?num(thbRate):"0"}
+function thbStorageKey(){return user ? "mc_usd_thb_totals_"+user.id : "mc_usd_thb_totals"}
+function loadThbRate(){const raw=localStorage.getItem(thbStorageKey());let d={usd:0,thb:0};try{d=raw?JSON.parse(raw):d}catch(e){} const usd=Number(d.usd)||0, thb=Number(d.thb)||0; const rate=usd>0?thb/usd:0; thbRate=rate>0?Math.floor((rate+1e-9)*10)/10:0; $("thbRate").textContent=thbRate?num(thbRate):"0"}
+function saveThbRate(v){thbRate=Number(v)||0;$("thbRate").textContent=thbRate?num(thbRate):"0"}
+function saveThbTotals(usd,thb){const raw=localStorage.getItem(thbStorageKey());let d={usd:0,thb:0};try{d=raw?JSON.parse(raw):d}catch(e){} d.usd+=(Number(usd)||0);d.thb+=(Number(thb)||0);localStorage.setItem(thbStorageKey(),JSON.stringify(d));loadThbRate()}
 const typ=t=>({ADD_CAPITAL:"Tambah modal",INITIAL_CAPITAL:"Modal awal",CUSTOMER_BUY:"Customer beli USD",CUSTOMER_SELL:"Customer jual USD"}[t]||t);
 const round=x=>Math.round(x/Number(settings.rounding_unit||100))*Number(settings.rounding_unit||100);
 const formatInput=n=>{
@@ -106,18 +107,17 @@ async function profitHistory(){let {data,error}=await sb.from("mc_monthly_profit
 async function rates(){try{let r=await fetch("https://api.exchangerate.fun/latest?base=USD",{cache:"no-store"}),j=await r.json();market=Number(j.rates?.[settings.base_currency]);if(!market)throw Error();$("marketRate").textContent=idr(market)+"/USD";$("rateMsg").textContent="Kurs pasar otomatis";$("sellRate").textContent=idr(Math.floor(market*(1-Number(settings.sell_margin))/Number(settings.rounding_unit||100))*Number(settings.rounding_unit||100))}catch(e){$("marketRate").textContent="Gagal memuat";$("rateMsg").textContent="Kurs dapat dimasukkan manual saat transaksi";}}
 function modal(t,b){$("modalTitle").textContent=t;$("modalBody").innerHTML=b;$("modalMsg").textContent="";$("modalMsg").className="status";$("modal").classList.remove("hidden")}$("close").onclick=()=>$("modal").classList.add("hidden");
 $("capitalBtn").onclick=()=>{
-  modal("Modal awal / tambah modal",'<div class=field><label>IDR</label><input id=a inputmode=decimal autocomplete=off></div><div class=field><label>USD</label><input id=u inputmode=decimal autocomplete=off></div><hr style="border-color:#292c2a;margin:16px 0"><div class=muted style="margin-bottom:8px">Tukar cash USD ke THB</div><div class=field><label>USD yang ditukar</label><input id=thbUsd inputmode=decimal autocomplete=off placeholder="Contoh: 100"></div><div class=field><label>THB yang diterima</label><input id=thbCash inputmode=decimal autocomplete=off placeholder="Contoh: 3320"></div><div class=field><label>Hasil kurs USD → THB</label><div id=thbPreview class=big>0 THB / USD</div></div><button id=go class=primary>Simpan modal</button>');
+  modal("Modal awal / tambah modal",'<div class=field><label>IDR</label><input id=a inputmode=decimal autocomplete=off></div><div class=field><label>USD</label><input id=u inputmode=decimal autocomplete=off></div><hr style="border-color:#292c2a;margin:16px 0"><div class=field><label>USD</label><input id=thbUsd inputmode=decimal autocomplete=off placeholder="Contoh: 100"></div><div class=field><label>THB</label><input id=thbCash inputmode=decimal autocomplete=off placeholder="Contoh: 3320"></div><button id=go class=primary>Simpan modal</button>');
   bindAmountInput("a");bindAmountInput("u");bindAmountInput("thbUsd");bindAmountInput("thbCash");
-  const calcThbRate=()=>{const usd=rawNumber($("thbUsd").value),thb=rawNumber($("thbCash").value);const rate=usd>0?thb/usd:0;$("thbPreview").textContent=rate?num(rate)+" THB / USD":"0 THB / USD";return rate};
-  $("thbUsd").addEventListener("input",calcThbRate);$("thbCash").addEventListener("input",calcThbRate);
-  if(thbRate){$("thbPreview").textContent=num(thbRate)+" THB / USD"}
   $("go").onclick=async()=>{
-    const thbUsd=rawNumber($("thbUsd").value),thbCash=rawNumber($("thbCash").value);
-    const newThbRate=thbUsd>0?thbCash/thbUsd:0;
-    if((thbUsd>0||thbCash>0)&&newThbRate<=0){$("modalMsg").textContent="Isi USD dan THB dengan benar.";$("modalMsg").className="status err";return}
-    let {error}=await sb.rpc("mc_add_capital",{p_base_amount:rawNumber($("a").value),p_trade_amount:rawNumber($("u").value)});
-    if(error){$("modalMsg").textContent=error.message;$("modalMsg").className="status err";return}
-    if(newThbRate>0)saveThbRate(newThbRate);
+    const base=rawNumber($("a").value), usdCapital=rawNumber($("u").value), thbUsd=rawNumber($("thbUsd").value), thbCash=rawNumber($("thbCash").value);
+    if((thbUsd>0)!==(thbCash>0)){$("modalMsg").textContent="Isi USD dan THB bersama-sama.";$("modalMsg").className="status err";return}
+    if(base<=0 && usdCapital<=0 && thbUsd<=0){$("modalMsg").textContent="Isi modal IDR/USD atau USD dan THB.";$("modalMsg").className="status err";return}
+    if(base>0 || usdCapital>0){
+      let {error}=await sb.rpc("mc_add_capital",{p_base_amount:base,p_trade_amount:usdCapital});
+      if(error){$("modalMsg").textContent=error.message;$("modalMsg").className="status err";return}
+    }
+    if(thbUsd>0 && thbCash>0)saveThbTotals(thbUsd,thbCash);
     $("modal").classList.add("hidden");await load();await hist()
   }
 };
