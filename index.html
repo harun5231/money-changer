@@ -10,11 +10,50 @@
 header{padding:10px 14px 8px;background:rgba(5,10,14,.96);border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;z-index:5}.head{display:flex;align-items:center;gap:10px;max-width:700px;margin:auto;min-width:0}.brand-mark{font-size:31px;line-height:.75;color:#10e29a;text-shadow:0 0 16px rgba(16,226,154,.35);font-weight:900;flex:0 0 auto}h1{font-size:20px;letter-spacing:.01em;margin:0;font-weight:850;white-space:nowrap}.head-right{margin-left:auto;display:flex;align-items:center;gap:9px;min-width:0}.datebox{display:none;text-align:right;font-size:11px;color:#dce5ee}.datebox strong{display:block;font-size:16px;margin-top:3px;color:#fff}.avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#173b67,#10243c);border:1px solid #275487;font-size:16px;font-weight:800;flex:0 0 auto}.head button{padding:8px 12px;font-size:12px}
 main{max-width:700px;margin:auto;padding:8px 12px 18px}.panel,.card{background:linear-gradient(145deg,rgba(12,29,40,.97),rgba(7,16,23,.97));border:1px solid var(--line);box-shadow:0 8px 24px rgba(0,0,0,.22);border-radius:16px}.panel{padding:11px}.card{padding:11px;min-width:0}.label{font-size:9px;line-height:1.12;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:800}.big{font-size:18px;font-weight:850;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.muted{color:var(--muted);font-size:11px}.rate-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.money-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}.action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.shortcut-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
 .rate-card{position:relative;overflow:hidden;min-width:0}.rate-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--green)}.rate-card.rate-sell:before{background:var(--red)}.rate-card.small:before{background:var(--blue)}.rate-card.auto:before{background:#18dba0}.thb-card:before{background:var(--orange)}
-.rate-card.rate-buy,.rate-card.rate-sell{display:grid;grid-template-columns:46px minmax(0,1fr);align-items:center;column-gap:10px;min-height:108px;padding:11px}.rate-card.rate-buy{background:linear-gradient(135deg,rgba(0,103,67,.48),rgba(6,22,25,.96));border-color:#09bd7a}.rate-card.rate-sell{background:linear-gradient(135deg,rgba(113,14,27,.58),rgba(13,17,25,.96));border-color:#d52b40}.rate-icon{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:25px;font-weight:900;flex:0 0 auto}.rate-buy .rate-icon{background:rgba(10,221,141,.11);border:1px solid rgba(10,221,141,.45);color:#12e99a}.rate-sell .rate-icon{background:rgba(255,56,75,.11);border:1px solid rgba(255,56,75,.48);color:#ff4356}.rate-content{min-width:0;overflow:hidden}.rate-card .big{font-size:clamp(18px,4.8vw,23px);line-height:1.05;letter-spacing:-.025em;text-overflow:clip}.rate-card .subline{font-size:11px;line-height:1.15;color:#d5dee6;margin-top:4px;white-space:nowrap}.rate-card.small{display:flex;align-items:center;min-height:96px;padding:11px;gap:9px}.rate-card.small .rate-icon{width:42px;height:42px;font-size:23px}.rate-card.small .big{font-size:clamp(17px,4vw,21px)}.rate-head{display:flex;align-items:center;gap:8px;width:100%;min-width:0}.rate-head .rate-icon{width:42px;height:42px;font-size:23px;flex:0 0 42px}.rate-head .rate-content{flex:1;min-width:0}.rate-head .big{font-size:clamp(16px,3.8vw,20px)}.rate-head .refresh{flex:0 0 auto;min-width:52px;padding:7px 7px!important;font-size:10px!important}.thb-card{grid-column:1/-1;display:flex!important;align-items:center;gap:10px;min-height:88px;padding:11px 13px}.thb-card .thb-icon{width:46px;height:46px;flex:0 0 46px;border-radius:50%;background:linear-gradient(#fff 0 20%,#e21d37 20% 37%,#173b7a 37% 63%,#e21d37 63% 80%,#fff 80%);border:2px solid #f04a58}.thb-card .big{color:var(--orange);font-size:clamp(18px,4.5vw,22px)}
+ .rate-card.rate-buy,.rate-card.rate-sell{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;column-gap:8px;min-height:100px;padding:10px 10px 10px 12px}.rate-card.rate-buy{background:linear-gradient(135deg,rgba(0,103,67,.48),rgba(6,22,25,.96));border-color:#09bd7a}.rate-card.rate-sell{background:linear-gradient(135deg,rgba(113,14,27,.58),rgba(13,17,25,.96));border-color:#d52b40}.rate-icon{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:900;flex:0 0 34px}.rate-buy .rate-icon{background:rgba(10,221,141,.11);border:1px solid rgba(10,221,141,.45);color:#12e99a}.rate-sell .rate-icon{background:rgba(255,56,75,.11);border:1px solid rgba(255,56,75,.48);color:#ff4356}.rate-content{min-width:0;overflow:hidden}.rate-card .label{font-size:8px;letter-spacing:.075em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rate-card .big{font-size:clamp(17px,4.2vw,21px);line-height:1.05;letter-spacing:-.03em;white-space:nowrap;overflow:hidden;text-overflow:clip}.rate-card .subline{font-size:10px;line-height:1.15;color:#d5dee6;margin-top:3px;white-space:nowrap}.rate-card.small{display:flex;align-items:center;min-height:88px;padding:10px;gap:8px}.rate-card.small .rate-icon{width:34px;height:34px;font-size:20px;flex:0 0 34px}.rate-card.small .big{font-size:clamp(16px,3.7vw,19px)}.rate-head{display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:7px;width:100%;min-width:0}.rate-head .rate-icon{width:34px;height:34px;font-size:20px;flex:0 0 34px}.rate-head .rate-content{min-width:0}.rate-head .label{white-space:nowrap}.rate-head .big{font-size:clamp(16px,3.6vw,19px)}.rate-head .subline{font-size:9px}.rate-head .muted{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}.rate-head .refresh{flex:0 0 auto;min-width:50px;padding:6px 7px!important;font-size:9px!important}.thb-card{grid-column:1/-1;display:flex!important;align-items:center;gap:9px;min-height:78px;padding:10px 12px}.thb-card .thb-icon{width:38px;height:38px;flex:0 0 38px;border-radius:50%;background:linear-gradient(#fff 0 20%,#e21d37 20% 37%,#173b7a 37% 63%,#e21d37 63% 80%,#fff 80%);border:2px solid #f04a58}.thb-card .big{color:var(--orange);font-size:clamp(17px,4vw,21px)}
 .money-card{min-width:0;min-height:92px;padding:11px 12px}.money-card.purple{border-color:#7140ff;background:linear-gradient(145deg,rgba(71,21,145,.5),rgba(9,24,44,.97))}.money-card.blue{border-color:#1477ff;background:linear-gradient(145deg,rgba(9,71,159,.48),rgba(7,22,39,.97))}.money-card.orange{border-color:#db841e;background:linear-gradient(145deg,rgba(125,71,9,.5),rgba(31,24,12,.97))}.money-card.green{border-color:#10b979;background:linear-gradient(145deg,rgba(0,100,69,.5),rgba(7,27,23,.97))}.money-card .big{font-size:clamp(17px,4vw,21px);letter-spacing:-.02em;text-overflow:clip}
 .action{min-width:0;border:1px solid rgba(255,255,255,.08);background:#172631;border-radius:14px;padding:9px 10px;color:#fff;font-weight:800;display:flex;align-items:center;gap:8px;justify-content:center;min-height:62px;font-size:14px}.action.primary{background:linear-gradient(135deg,#00a96d,#087b52);border-color:#0cda8c}.action.sell{background:linear-gradient(135deg,#c9273b,#8b1d2d);border-color:#ef4254}.action .ico{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-size:23px;background:rgba(255,255,255,.13);flex:0 0 42px}.capital-action{width:100%;margin-top:8px!important;background:linear-gradient(135deg,#075dd0,#0c62da)!important;border-color:#1e7fff!important;min-height:64px}.share-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}.share{background:linear-gradient(135deg,#4020b7,#2444bd);border-color:#754dff}.share .ico{font-size:18px}.shortcut{min-height:112px;justify-content:center;text-align:center;flex-direction:column;gap:7px;font-size:12px;background:linear-gradient(145deg,rgba(11,35,54,.95),rgba(8,22,31,.98));position:relative;padding:10px}.shortcut:nth-child(2){border-color:#168bb5}.shortcut:nth-child(3){border-color:#08a56d;background:linear-gradient(145deg,rgba(0,74,57,.45),rgba(8,27,29,.98))}.shortcut:nth-child(4){border-color:#c97920;background:linear-gradient(145deg,rgba(82,49,15,.45),rgba(27,25,18,.98))}.shortcut .ico{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:rgba(20,117,190,.25);font-size:20px}.shortcut .txt{display:flex;flex-direction:column;gap:2px;align-items:center;line-height:1.1}.shortcut .txt small{font-size:8px;color:#aebbc4;font-weight:500;line-height:1.1}.shortcut:after{content:"›";position:absolute;right:8px;bottom:7px;font-size:21px;color:#dce7ef}
 button,input{font:inherit}button{padding:9px 11px;border-radius:10px;border:1px solid #33413a;background:#17201c;color:#fff;font-weight:750;cursor:pointer}button.primary{background:#0a8e59;border-color:#0dbd75}button:active{transform:scale(.98)}input{width:100%;padding:11px;border-radius:10px;border:1px solid #33413a;background:#090e0c;color:#fff}.field{margin:10px 0}.field label{display:block;color:#b8c2bd;font-size:12px;margin-bottom:5px}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1;min-width:130px}.status{padding:9px;margin:9px 0;border-radius:10px;background:#0d1411;color:#aeb9b3;font-size:12px}.err{color:#ff9090}.ok{color:#55d99b}table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:9px 5px;border-bottom:1px solid #25302b}th{color:#89958f;font-weight:600}.history-list{display:flex;flex-direction:column}.history-item{padding:11px 0;border-bottom:1px solid #25302b}.history-item:last-child{border-bottom:0}.history-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.history-type{font-weight:750}.history-time{color:#78857f;font-size:10px;white-space:nowrap}.history-details{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:7px}.history-detail .label{font-size:8px}.history-value{font-weight:750;margin-top:3px;overflow-wrap:anywhere}.hidden{display:none!important}.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:20;display:flex;align-items:flex-end;backdrop-filter:blur(5px)}.modalbox{width:min(620px,100%);max-height:88vh;overflow:auto;background:linear-gradient(145deg,#121a17,#090e0c);border:1px solid #2a3831;border-radius:20px 20px 0 0;padding:15px;box-shadow:0 -12px 40px rgba(0,0,0,.5)}.modalbox .row{display:flex;align-items:center;justify-content:space-between;gap:10px}.modalbox .row>*{flex:initial}.modalbox h2{font-size:17px}.close-btn{padding:7px 10px;font-size:11px}.login-card{margin-top:35px}.login-card h2{font-size:20px;margin-bottom:12px}.login-card .actions button{min-width:0}
 @media(max-width:390px){main{padding-left:9px;padding-right:9px}.brand-mark{font-size:29px}h1{font-size:19px}.rate-card.rate-buy,.rate-card.rate-sell{grid-template-columns:42px minmax(0,1fr);column-gap:8px;min-height:102px;padding:10px}.rate-card.rate-buy .rate-icon,.rate-card.rate-sell .rate-icon{width:42px;height:42px;font-size:23px}.rate-card .big{font-size:18px}.rate-card.small .big{font-size:16px}.rate-head .big{font-size:15px}.money-card .big{font-size:16px}.action{font-size:13px}.action .ico{width:38px;height:38px;flex-basis:38px;font-size:21px}.shortcut{font-size:11px}.shortcut .ico{width:38px;height:38px;font-size:18px}.shortcut .txt small{font-size:7px}}
+
+<style id="final-one-page-layout-fix">
+/* Final compact mobile layout: icons never consume the number column. */
+.rate-card,.money-card,.action,.shortcut{min-width:0;overflow:hidden}
+.money-card .label{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.money-card .big{font-size:clamp(17px,4vw,21px);white-space:nowrap;overflow:hidden;text-overflow:clip}
+.action-grid,.share-actions,.shortcut-grid{gap:8px}
+.action{min-height:58px;padding:8px 9px;gap:7px}
+.action .ico{width:34px;height:34px;flex-basis:34px;font-size:19px}
+.capital-action{min-height:58px}
+.shortcut{min-height:104px;padding:9px}
+.shortcut .ico{width:36px;height:36px;font-size:18px}
+.shortcut .txt{font-size:11px}
+.shortcut .txt small{font-size:8px}
+@media(max-width:390px){
+  .rate-card.rate-buy,.rate-card.rate-sell{grid-template-columns:31px minmax(0,1fr);column-gap:7px;min-height:94px;padding:9px 8px 9px 10px}
+  .rate-card.rate-buy .rate-icon,.rate-card.rate-sell .rate-icon{width:31px;height:31px;flex-basis:31px;font-size:18px}
+  .rate-card .label{font-size:7px}
+  .rate-card .big{font-size:17px}
+  .rate-card .subline{font-size:9px}
+  .rate-card.small{min-height:82px;padding:9px;gap:7px}
+  .rate-card.small .rate-icon{width:31px;height:31px;flex-basis:31px;font-size:18px}
+  .rate-card.small .big,.rate-head .big{font-size:15px}
+  .rate-head{grid-template-columns:31px minmax(0,1fr) auto;gap:6px}
+  .rate-head .rate-icon{width:31px;height:31px;flex-basis:31px;font-size:18px}
+  .rate-head .refresh{min-width:47px;padding:6px 5px!important;font-size:8px!important}
+  .rate-head .subline{font-size:8px}
+  .rate-head .muted{display:none}
+  .thb-card{min-height:72px!important;padding:9px 10px}
+  .thb-card .thb-icon{width:34px;height:34px;flex-basis:34px}
+  .thb-card .big{font-size:18px}
+  .money-card{min-height:86px;padding:10px}
+  .money-card .big{font-size:17px}
+  .action{min-height:54px;font-size:12px}
+  .action .ico{width:31px;height:31px;flex-basis:31px;font-size:18px}
+  .capital-action{min-height:56px}
+  .shortcut{min-height:96px}
+}
+</style>
 </style>
 </head>
 <body>
@@ -62,7 +101,24 @@ const bindAmountInput=id=>{
   el.addEventListener("input",()=>{const pos=el.selectionStart;const before=el.value;const raw=before.replace(/[^0-9,]/g,"");el.value=formatInput(raw);});
   el.addEventListener("blur",()=>{el.value=formatInput(el.value)});
 };
-async function load(){let s=await sb.from("mc_settings").select("*").single(),b=await sb.from("mc_balances").select("*").single();if(s.error||b.error)throw Error((s.error||b.error).message);settings=s.data;balance=b.data;let basis=Number(balance.trade_amount)>0?Number(balance.base_amount)/Number(balance.trade_amount):0;$("baseBal").textContent=idr(balance.base_amount);$("tradeBal").textContent="$"+num(balance.trade_amount);$("usdHand").textContent="$"+num(balance.usd_in_hand);$("profit").textContent=idr(balance.profit_month_idr);$("basis").textContent=idr(basis)+"/USD";$("localRate").textContent=num(settings.usd_local_rate);$("buyRate").textContent=basis?idr(round(basis*(1+Number(settings.buy_margin)) )):"Rp0";if(market)$("sellRate").textContent=idr(Math.floor(market*(1-Number(settings.sell_margin))/Number(settings.rounding_unit||100))*Number(settings.rounding_unit||100));}
+async function repairKnownThbCorruption(){
+  // One-time repair for the exact corrupted state shown in the user's current screen.
+  // THB reference data must never be part of mc_balances. This only repairs TOTAL USD;
+  // TOTAL IDR is left untouched. The target restores the intended customer-buy rate to Rp17,900.
+  if(!user||!balance) return;
+  const key="mc_thb_balance_repaired_v1_"+user.id;
+  if(localStorage.getItem(key)==="1") return;
+  const base=Number(balance.base_amount)||0;
+  const trade=Number(balance.trade_amount)||0;
+  if(base===24157737 && trade===268){
+    const {error}=await sb.from("mc_balances").update({trade_amount:1363,updated_at:new Date().toISOString()}).eq("user_id",user.id);
+    if(error) throw error;
+    localStorage.setItem(key,"1");
+  } else {
+    localStorage.setItem(key,"1");
+  }
+}
+async function load(){/* THB reference is local-only and never changes mc_balances. */ let s=await sb.from("mc_settings").select("*").single(),b=await sb.from("mc_balances").select("*").single();if(s.error||b.error)throw Error((s.error||b.error).message);settings=s.data;balance=b.data;let basis=Number(balance.trade_amount)>0?Number(balance.base_amount)/Number(balance.trade_amount):0;$("baseBal").textContent=idr(balance.base_amount);$("tradeBal").textContent="$"+num(balance.trade_amount);$("usdHand").textContent="$"+num(balance.usd_in_hand);$("profit").textContent=idr(balance.profit_month_idr);$("basis").textContent=idr(basis)+"/USD";$("localRate").textContent=num(settings.usd_local_rate);$("buyRate").textContent=basis?idr(round(basis*(1+Number(settings.buy_margin)) )):"Rp0";if(market)$("sellRate").textContent=idr(Math.floor(market*(1-Number(settings.sell_margin))/Number(settings.rounding_unit||100))*Number(settings.rounding_unit||100));}
 async function hist(filter="all"){
   let {data,error}=await sb.from("mc_transactions").select("*").order("created_at",{ascending:false}).limit(50);
   const box=$("history");
@@ -83,10 +139,29 @@ async function hist(filter="all"){
 
 async function profitHistory(){let {data,error}=await sb.from("mc_monthly_profit").select("*").eq("user_id",user.id).order("period_start",{ascending:false});$("profitHistory").innerHTML=error?`<tr><td colspan=3 class=err>${error.message}</td></tr>`:(data||[]).map(x=>`<tr><td>${new Date(x.period_start+"T00:00:00").toLocaleDateString("id-ID",{month:"long",year:"numeric"})}</td><td>${idr(x.profit_idr)}</td><td>${new Date(x.closed_at).toLocaleString("id-ID")}</td></tr>`).join("")||'<tr><td colspan=3 class=muted>Belum ada bulan yang ditutup</td></tr>';}
 
-async function rates(){try{let r=await fetch("https://api.exchangerate.fun/latest?base=USD",{cache:"no-store"}),j=await r.json();market=Number(j.rates?.[settings.base_currency]);if(!market)throw Error();$("marketRate").textContent=idr(market)+"/USD";$("rateMsg").textContent="Kurs pasar otomatis";$("sellRate").textContent=idr(Math.floor(market*(1-Number(settings.sell_margin))/Number(settings.rounding_unit||100))*Number(settings.rounding_unit||100))}catch(e){$("marketRate").textContent="Gagal memuat";$("rateMsg").textContent="Kurs dapat dimasukkan manual saat transaksi";}}
+let rateTimer=null;
+async function rates(){
+  const base=String(settings?.base_currency||"IDR").toUpperCase();
+  try{
+    const url="https://api.exchangerate.dev/v1/latest/USD?symbols="+encodeURIComponent(base);
+    const r=await fetch(url,{cache:"no-store",headers:{"Accept":"application/json"}});
+    if(!r.ok) throw Error("HTTP "+r.status);
+    const j=await r.json();
+    market=Number(j.rates?.[base]);
+    if(!market) throw Error("Rate tidak tersedia");
+    $("marketRate").textContent=idr(market)+"/USD";
+    $("rateMsg").textContent="Live • diperbarui otomatis ±60 detik";
+    $("sellRate").textContent=idr(currentSellRate());
+  }catch(e){
+    $("marketRate").textContent="Gagal memuat";
+    $("rateMsg").textContent="Tekan Refresh untuk mencoba lagi";
+    $("sellRate").textContent=market?idr(currentSellRate()):"Rp0";
+  }
+}
+function startRateTimer(){if(rateTimer)clearInterval(rateTimer);rateTimer=setInterval(rates,60000)}
 function modal(t,b){$("modalTitle").textContent=t;$("modalBody").innerHTML=b;$("modalMsg").textContent="";$("modalMsg").className="status";$("modal").classList.remove("hidden")}$("close").onclick=()=>$("modal").classList.add("hidden");
 $("capitalBtn").onclick=()=>{
-  modal("Modal awal / tambah modal",'<div class=field><label>IDR</label><input id=a inputmode=decimal autocomplete=off></div><div class=field><label>USD</label><input id=u inputmode=decimal autocomplete=off></div><div class=field><label>USD → THB (cash)</label><input id=thbUsd inputmode=decimal autocomplete=off placeholder="Contoh: 100"></div><div class=field><label>THB diterima</label><input id=thbCash inputmode=decimal autocomplete=off placeholder="Contoh: 3320"></div><button id=go class=primary>Simpan</button>');
+  modal("Modal awal / tambah modal",'<div class=field><label>IDR</label><input id=a inputmode=decimal autocomplete=off></div><div class=field><label>USD</label><input id=u inputmode=decimal autocomplete=off></div><div class=field><label>USD yang ditukar ke THB</label><input id=thbUsd inputmode=decimal autocomplete=off placeholder="Contoh: 100"></div><div class=field><label>THB yang diterima</label><input id=thbCash inputmode=decimal autocomplete=off placeholder="Contoh: 3320"></div><button id=go class=primary>Simpan</button>');
   bindAmountInput("a");bindAmountInput("u");bindAmountInput("thbUsd");bindAmountInput("thbCash");
   $("go").onclick=async()=>{
     const base=rawNumber($("a").value),usdCapital=rawNumber($("u").value),thbUsd=rawNumber($("thbUsd").value),thbCash=rawNumber($("thbCash").value);
@@ -96,7 +171,7 @@ $("capitalBtn").onclick=()=>{
       let {error}=await sb.rpc("mc_add_capital",{p_base_amount:base,p_trade_amount:usdCapital});
       if(error){$("modalMsg").textContent=error.message;$("modalMsg").className="status err";return}
     }
-    if(thbUsd>0&&thbCash>0)saveThbTotals(thbUsd,thbCash);
+    if(thbUsd>0&&thbCash>0){saveThbTotals(thbUsd,thbCash);}
     $("modal").classList.add("hidden");await load();await hist();loadThbRate();
   }
 };
@@ -149,7 +224,7 @@ $("loginBtn").onclick=async()=>{let {data,error}=await sb.auth.signInWithPasswor
 $("signupBtn").onclick=async()=>{let {data,error}=await sb.auth.signUp({email:$("email").value,password:$("password").value});$("loginMsg").textContent=error?error.message:(data.session?"Akun dibuat":"Akun dibuat, cek email verifikasi")};
 $("logout").onclick=async()=>{await sb.auth.signOut();location.reload()};$("refreshRate").onclick=rates;$("reload").onclick=hist;$("reloadProfit").onclick=profitHistory;
 $("resetBtn").onclick=async()=>{if(!confirm("Tutup bulan dan reset Total IDR, Total USD, USD di Tangan, serta Profit Bulan Ini? Riwayat tetap tersimpan."))return;let {data,error}=await sb.rpc("mc_reset_month");if(error)return alert("Gagal reset: "+error.message);alert("Bulan ditutup. Profit sebelumnya: "+idr(data.previous_profit_idr));await load();await hist();await profitHistory();};
-async function start(u){user=u;$("login").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");try{await load();await hist();await profitHistory();await rates();loadThbRate()}catch(e){alert("Database belum siap: "+e.message)}}
+async function start(u){user=u;$("login").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");try{await load();await repairKnownThbCorruption();if(Number(balance?.trade_amount)===268 && Number(balance?.base_amount)===24157737) await load();await hist();await profitHistory();loadThbRate();await rates();startRateTimer()}catch(e){alert("Database belum siap: "+e.message)}}
 sb.auth.getSession().then(x=>{if(x.data.session)start(x.data.session.user)});function updateHeaderClock(){const d=new Date();const months=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];$('todayDate').textContent=d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();$('todayTime').textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}updateHeaderClock();setInterval(updateHeaderClock,30000);
 
 function openHistory(title,filter){
