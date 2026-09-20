@@ -16,7 +16,7 @@ main{max-width:700px;margin:auto;padding:8px 12px 18px}.panel,.card{background:l
 button,input{font:inherit}button{padding:9px 11px;border-radius:10px;border:1px solid #33413a;background:#17201c;color:#fff;font-weight:750;cursor:pointer}button.primary{background:#0a8e59;border-color:#0dbd75}button:active{transform:scale(.98)}input{width:100%;padding:11px;border-radius:10px;border:1px solid #33413a;background:#090e0c;color:#fff}.field{margin:10px 0}.field label{display:block;color:#b8c2bd;font-size:12px;margin-bottom:5px}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1;min-width:130px}.status{padding:9px;margin:9px 0;border-radius:10px;background:#0d1411;color:#aeb9b3;font-size:12px}.err{color:#ff9090}.ok{color:#55d99b}table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:9px 5px;border-bottom:1px solid #25302b}th{color:#89958f;font-weight:600}.history-list{display:flex;flex-direction:column}.history-item{padding:11px 0;border-bottom:1px solid #25302b}.history-item:last-child{border-bottom:0}.history-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.history-type{font-weight:750}.history-time{color:#78857f;font-size:10px;white-space:nowrap}.history-details{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:7px}.history-detail .label{font-size:8px}.history-value{font-weight:750;margin-top:3px;overflow-wrap:anywhere}.hidden{display:none!important}.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:20;display:flex;align-items:flex-end;backdrop-filter:blur(5px)}.modalbox{width:min(620px,100%);max-height:88vh;overflow:auto;background:linear-gradient(145deg,#121a17,#090e0c);border:1px solid #2a3831;border-radius:20px 20px 0 0;padding:15px;box-shadow:0 -12px 40px rgba(0,0,0,.5)}.modalbox .row{display:flex;align-items:center;justify-content:space-between;gap:10px}.modalbox .row>*{flex:initial}.modalbox h2{font-size:17px}.close-btn{padding:7px 10px;font-size:11px}.login-card{margin-top:35px}.login-card h2{font-size:20px;margin-bottom:12px}.login-card .actions button{min-width:0}
 @media(max-width:390px){main{padding-left:9px;padding-right:9px}.brand-mark{font-size:29px}h1{font-size:19px}.rate-card.rate-buy,.rate-card.rate-sell{grid-template-columns:42px minmax(0,1fr);column-gap:8px;min-height:102px;padding:10px}.rate-card.rate-buy .rate-icon,.rate-card.rate-sell .rate-icon{width:42px;height:42px;font-size:23px}.rate-card .big{font-size:18px}.rate-card.small .big{font-size:16px}.rate-head .big{font-size:15px}.money-card .big{font-size:16px}.action{font-size:13px}.action .ico{width:38px;height:38px;flex-basis:38px;font-size:21px}.shortcut{font-size:11px}.shortcut .ico{width:38px;height:38px;font-size:18px}.shortcut .txt small{font-size:7px}}
 
-<style id="final-one-page-layout-fix">
+
 /* Final compact mobile layout: icons never consume the number column. */
 .rate-card,.money-card,.action,.shortcut{min-width:0;overflow:hidden}
 .money-card .label{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -53,7 +53,30 @@ button,input{font:inherit}button{padding:9px 11px;border-radius:10px;border:1px 
   .capital-action{min-height:56px}
   .shortcut{min-height:96px}
 }
-</style>
+
+/* FINAL RATE CARD FIX */
+.auto-refresh-card{appearance:none;-webkit-appearance:none;width:100%;cursor:pointer;text-align:left;color:var(--text);font-family:inherit;border-radius:16px!important;padding:10px!important;}
+.auto-refresh-card:active{transform:scale(.995)}
+.auto-refresh-card .rate-head{grid-template-columns:34px minmax(0,1fr);gap:8px;}
+.auto-refresh-card .rate-content{min-width:0;}
+.auto-refresh-card .label{font-size:9px!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;}
+.auto-refresh-card .big{font-size:clamp(17px,3.7vw,21px)!important;line-height:1.05!important;overflow:visible!important;text-overflow:clip!important;white-space:nowrap!important;}
+.auto-refresh-card .subline{font-size:10px!important;white-space:nowrap!important;}
+.auto-refresh-card .muted{font-size:9px!important;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;}
+.thb-card{gap:9px!important;}
+.thb-card .rate-content{flex:1;min-width:0;}
+.thb-delete{flex:0 0 auto!important;padding:6px 8px!important;font-size:9px!important;border-radius:8px!important;background:#38161b!important;border-color:#a73342!important;color:#ff9eaa!important;}
+.thb-delete:disabled{opacity:.35;cursor:not-allowed;}
+@media(max-width:390px){
+ .auto-refresh-card{padding:9px!important;}
+ .auto-refresh-card .rate-head{grid-template-columns:31px minmax(0,1fr);gap:6px;}
+ .auto-refresh-card .rate-head .rate-icon{width:31px;height:31px;flex-basis:31px;font-size:18px;}
+ .auto-refresh-card .label{font-size:8px!important;}
+ .auto-refresh-card .big{font-size:16px!important;}
+ .auto-refresh-card .subline{font-size:9px!important;}
+ .auto-refresh-card .muted{font-size:8px!important;}
+ .thb-delete{padding:5px 7px!important;font-size:8px!important;}
+}
 </style>
 </head>
 <body>
@@ -64,8 +87,8 @@ button,input{font:inherit}button{padding:9px 11px;border-radius:10px;border:1px 
 <div class="card rate-card rate-buy"><div class="rate-icon">↗</div><div class="rate-content"><div class="label">KURS BELI USD</div><div id="buyRate" class="big green">Rp0</div><div class="subline">dari customer</div></div></div>
 <div class="card rate-card rate-sell"><div class="rate-icon">↓</div><div class="rate-content"><div class="label">KURS JUAL USD</div><div id="sellRate" class="big red">Rp0</div><div class="subline">ke customer</div></div></div>
 <div class="card rate-card small"><div class="rate-icon base-icon">↻</div><div class="rate-content"><div class="label">KURS DASAR</div><div id="basis" class="big blue">Rp0</div><div class="subline">per 1 USD</div></div></div>
-<div class="card rate-card small auto"><div class="rate-head"><div class="rate-icon auto-icon">↻</div><div class="rate-content"><div class="label">KURS OTOMATIS ⓘ</div><div id="marketRate" class="big purple">Memuat...</div><div class="subline">per 1 USD</div><div id="rateMsg" class="muted"></div></div><button id="refreshRate" class="refresh">Refresh</button></div></div>
-<div class="card rate-card small thb-card"><div class="rate-icon thb-icon"></div><div class="rate-content"><div class="label">USD → THB</div><div id="thbRate" class="big orange">—</div><div class="subline">THB per 1 USD</div></div></div></div>
+<button id="refreshRate" class="card rate-card small auto auto-refresh-card" type="button" aria-label="Refresh kurs otomatis"><div class="rate-head"><div class="rate-icon auto-icon">↻</div><div class="rate-content"><div class="label">KURS OTOMATIS</div><div id="marketRate" class="big purple">Memuat...</div><div class="subline">per 1 USD</div><div id="rateMsg" class="muted">Tap kartu untuk refresh</div></div></div></button>
+<div class="card rate-card small thb-card"><div class="rate-icon thb-icon"></div><div class="rate-content"><div class="label">USD → THB</div><div id="thbRate" class="big orange">—</div><div class="subline">THB per 1 USD</div></div><button id="deleteThbBtn" class="thb-delete" type="button" title="Hapus input USD → THB terakhir">Hapus</button></div></div>
 <div class="money-grid"><div class="card money-card purple"><div class="label">TOTAL MODAL (IDR)</div><div id="baseBal" class="big">Rp0</div></div><div class="card money-card blue"><div class="label">TOTAL USD</div><div id="tradeBal" class="big">$0</div></div><div class="card money-card orange"><div class="label">USD DI TANGAN</div><div id="usdHand" class="big">$0</div></div><div class="card money-card green"><div class="label">PROFIT BULAN INI</div><div id="profit" class="big">Rp0</div></div></div>
 <div class="action-grid" style="margin-top:10px"><button id="buyBtn" class="action primary"><span class="ico">↗</span><span>Customer<br>Beli USD</span></button><button id="sellBtn" class="action sell"><span class="ico">↓</span><span>Customer<br>Jual USD</span></button></div>
 <button id="capitalBtn" class="action capital-action"><span class="ico">＋</span><span>Tambah Modal</span></button>
@@ -76,9 +99,45 @@ button,input{font:inherit}button{padding:9px 11px;border-radius:10px;border:1px 
 <script>
 const {createClient}=supabase, sb=createClient(MC_CONFIG.SUPABASE_URL,MC_CONFIG.SUPABASE_PUBLISHABLE_KEY);let user,settings,balance,market=0;
 let thbRate=0;
-function thbStorageKey(){return user ? "mc_usd_thb_totals_"+user.id : "mc_usd_thb_totals"}
-function loadThbRate(){const raw=localStorage.getItem(thbStorageKey());let d={usd:0,thb:0};try{d=raw?JSON.parse(raw):d}catch(e){}const usd=Number(d.usd)||0,thb=Number(d.thb)||0;const rate=usd>0?thb/usd:0;thbRate=rate>0?Math.floor((rate+1e-9)*10)/10:0;$("thbRate").textContent=thbRate?num(thbRate):"—"}
-function saveThbTotals(usd,thb){const raw=localStorage.getItem(thbStorageKey());let d={usd:0,thb:0};try{d=raw?JSON.parse(raw):d}catch(e){}d.usd+=(Number(usd)||0);d.thb+=(Number(thb)||0);localStorage.setItem(thbStorageKey(),JSON.stringify(d));loadThbRate()}
+function thbStorageKey(){return user ? "mc_usd_thb_entries_"+user.id : "mc_usd_thb_entries"}
+function readThbEntries(){
+  const key=thbStorageKey();
+  let d={entries:[]};
+  try{d=JSON.parse(localStorage.getItem(key)||"{}")}catch(e){}
+  if(!Array.isArray(d.entries)){
+    // Migrate the previous THB-only storage without touching Supabase balances.
+    let old={};
+    try{old=JSON.parse(localStorage.getItem(user?"mc_usd_thb_totals_"+user.id:"mc_usd_thb_totals")||"{}")}catch(e){}
+    const usd=Number(d.usd)||Number(old.usd)||0;
+    const thb=Number(d.thb)||Number(old.thb)||0;
+    d={entries:usd>0&&thb>0?[{usd,thb,legacy:true}]:[]};
+    localStorage.setItem(key,JSON.stringify(d));
+  }
+  return d.entries.filter(x=>(Number(x.usd)||0)>0&&(Number(x.thb)||0)>0);
+}
+function loadThbRate(){
+  const entries=readThbEntries();
+  const usd=entries.reduce((a,x)=>a+(Number(x.usd)||0),0);
+  const thb=entries.reduce((a,x)=>a+(Number(x.thb)||0),0);
+  const rate=usd>0?thb/usd:0;
+  thbRate=rate>0?Math.floor((rate+1e-9)*10)/10:0;
+  $("thbRate").textContent=thbRate?num(thbRate):"—";
+  $("deleteThbBtn").disabled=entries.length===0;
+  $("deleteThbBtn").title=entries.length>0?"Hapus input USD → THB terakhir":"Belum ada input USD → THB";
+}
+function saveThbTotals(usd,thb){
+  const entries=readThbEntries();
+  entries.push({usd:Number(usd)||0,thb:Number(thb)||0,at:new Date().toISOString()});
+  localStorage.setItem(thbStorageKey(),JSON.stringify({entries}));
+  loadThbRate();
+}
+function deleteLastThb(){
+  const entries=readThbEntries();
+  if(!entries.length)return;
+  entries.pop();
+  localStorage.setItem(thbStorageKey(),JSON.stringify({entries}));
+  loadThbRate();
+}
 const $=x=>document.getElementById(x), idr=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(n)||0), num=n=>new Intl.NumberFormat("id-ID",{maximumFractionDigits:2}).format(Number(n)||0);
 const typ=t=>({ADD_CAPITAL:"Tambah modal",INITIAL_CAPITAL:"Modal awal",CUSTOMER_BUY:"Customer beli USD",CUSTOMER_SELL:"Customer jual USD"}[t]||t);
 const round=x=>Math.round(x/Number(settings.rounding_unit||100))*Number(settings.rounding_unit||100);
@@ -140,21 +199,48 @@ async function hist(filter="all"){
 async function profitHistory(){let {data,error}=await sb.from("mc_monthly_profit").select("*").eq("user_id",user.id).order("period_start",{ascending:false});$("profitHistory").innerHTML=error?`<tr><td colspan=3 class=err>${error.message}</td></tr>`:(data||[]).map(x=>`<tr><td>${new Date(x.period_start+"T00:00:00").toLocaleDateString("id-ID",{month:"long",year:"numeric"})}</td><td>${idr(x.profit_idr)}</td><td>${new Date(x.closed_at).toLocaleString("id-ID")}</td></tr>`).join("")||'<tr><td colspan=3 class=muted>Belum ada bulan yang ditutup</td></tr>';}
 
 let rateTimer=null;
+function parseGoogleIdr(text){
+  const m=String(text||"").match(/Dolar Amerika Serikat\s*\/\s*Rupiah Indonesia[\s\S]{0,220}?([0-9]{1,3}(?:\.[0-9]{3})*(?:,[0-9]+)?)/i);
+  if(!m)return 0;
+  const v=m[1].replace(/\./g,"").replace(",",".");
+  return Number(v)||0;
+}
+async function googleFinanceRate(){
+  const target="https://www.google.com/finance/quote/USD-IDR?hl=id";
+  const urls=[
+    target,
+    "https://r.jina.ai/http://www.google.com/finance/quote/USD-IDR?hl=id"
+  ];
+  for(const url of urls){
+    try{
+      const r=await fetch(url,{cache:"no-store",headers:{"Accept":"text/html,text/plain,*/*"}});
+      if(!r.ok)continue;
+      const text=await r.text();
+      const value=parseGoogleIdr(text);
+      if(value>10000&&value<30000)return value;
+    }catch(e){}
+  }
+  return 0;
+}
 async function rates(){
-  const base=String(settings?.base_currency||"IDR").toUpperCase();
   try{
-    const url="https://api.exchangerate.dev/v1/latest/USD?symbols="+encodeURIComponent(base);
-    const r=await fetch(url,{cache:"no-store",headers:{"Accept":"application/json"}});
-    if(!r.ok) throw Error("HTTP "+r.status);
-    const j=await r.json();
-    market=Number(j.rates?.[base]);
-    if(!market) throw Error("Rate tidak tersedia");
+    let value=await googleFinanceRate();
+    let source="Google Finance";
+    if(!value){
+      const r=await fetch("https://api.exchangerate.dev/v1/latest/USD?symbols=IDR",{cache:"no-store",headers:{"Accept":"application/json"}});
+      if(!r.ok)throw Error("HTTP "+r.status);
+      const j=await r.json();
+      value=Number(j.rates?.IDR)||0;
+      source="Market";
+    }
+    if(!value)throw Error("Rate tidak tersedia");
+    market=value;
     $("marketRate").textContent=idr(market)+"/USD";
-    $("rateMsg").textContent="Live • diperbarui otomatis ±60 detik";
+    $("rateMsg").textContent=source+" • tap untuk refresh";
     $("sellRate").textContent=idr(currentSellRate());
   }catch(e){
-    $("marketRate").textContent="Gagal memuat";
-    $("rateMsg").textContent="Tekan Refresh untuk mencoba lagi";
+    $("marketRate").textContent=market?idr(market)+"/USD":"Gagal memuat";
+    $("rateMsg").textContent=market?"Kurs terakhir • tap untuk refresh":"Koneksi kurs gagal";
     $("sellRate").textContent=market?idr(currentSellRate()):"Rp0";
   }
 }
@@ -222,7 +308,7 @@ $("shareSellBtn").onclick=()=>{
 };
 $("loginBtn").onclick=async()=>{let {data,error}=await sb.auth.signInWithPassword({email:$("email").value,password:$("password").value});$("loginMsg").textContent=error?error.message:"Berhasil masuk";if(!error)start(data.user)};
 $("signupBtn").onclick=async()=>{let {data,error}=await sb.auth.signUp({email:$("email").value,password:$("password").value});$("loginMsg").textContent=error?error.message:(data.session?"Akun dibuat":"Akun dibuat, cek email verifikasi")};
-$("logout").onclick=async()=>{await sb.auth.signOut();location.reload()};$("refreshRate").onclick=rates;$("reload").onclick=hist;$("reloadProfit").onclick=profitHistory;
+$("logout").onclick=async()=>{await sb.auth.signOut();location.reload()};$("refreshRate").onclick=async()=>{const msg=$("rateMsg");if(msg)msg.textContent="Memuat kurs Google...";await rates();};$("deleteThbBtn").onclick=()=>{const entries=readThbEntries();if(!entries.length)return;if(confirm("Hapus input USD → THB terakhir? Kurs akumulasi akan dihitung ulang."))deleteLastThb();};$("reload").onclick=hist;$("reloadProfit").onclick=profitHistory;
 $("resetBtn").onclick=async()=>{if(!confirm("Tutup bulan dan reset Total IDR, Total USD, USD di Tangan, serta Profit Bulan Ini? Riwayat tetap tersimpan."))return;let {data,error}=await sb.rpc("mc_reset_month");if(error)return alert("Gagal reset: "+error.message);alert("Bulan ditutup. Profit sebelumnya: "+idr(data.previous_profit_idr));await load();await hist();await profitHistory();};
 async function start(u){user=u;$("login").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");try{await load();await repairKnownThbCorruption();if(Number(balance?.trade_amount)===268 && Number(balance?.base_amount)===24157737) await load();await hist();await profitHistory();loadThbRate();await rates();startRateTimer()}catch(e){alert("Database belum siap: "+e.message)}}
 sb.auth.getSession().then(x=>{if(x.data.session)start(x.data.session.user)});function updateHeaderClock(){const d=new Date();const months=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];$('todayDate').textContent=d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();$('todayTime').textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}updateHeaderClock();setInterval(updateHeaderClock,30000);
