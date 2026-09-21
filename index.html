@@ -289,22 +289,53 @@ $("capitalBtn").onclick=()=>{
   }
 };
 $("buyBtn").onclick=()=>{
-  modal("Customer beli USD",'<p class=muted>Customer memberikan IDR, menerima USD.</p><div class=field><label>Jumlah USD</label><input id=u inputmode=decimal autocomplete=off></div><div class=field><label>Nama customer (opsional)</label><input id=n></div><button id=go class=primary>Proses</button>');
+  modal("Customer beli",'<div class="field"><label>Mata uang yang dibeli</label><select id="buyCurrency"><option value="USD">USD</option><option value="THB">THB</option></select></div><p id="buyHint" class="muted">Customer memberikan IDR, menerima USD.</p><div class="field"><label id="buyAmountLabel">Jumlah USD</label><input id="u" inputmode="decimal" autocomplete="off"></div><div id="buyUsdEq" class="muted"></div><div class="field"><label>Nama customer (opsional)</label><input id="n"></div><button id="go" class="primary">Proses</button>');
   bindAmountInput("u");
+  const currency=$("buyCurrency");
+  const syncBuy=()=>{
+    const isThb=currency.value==="THB";
+    $("buyHint").textContent=isThb?"Customer memberikan IDR, menerima THB.":"Customer memberikan IDR, menerima USD.";
+    $("buyAmountLabel").textContent=isThb?"Jumlah THB":"Jumlah USD";
+    $("buyUsdEq").textContent=isThb?(thbRate>0?"Setara USD: "+num(rawNumber($("u").value)/thbRate)+" USD":"Kurs USD → THB belum tersedia."):"";
+  };
+  currency.onchange=syncBuy;
+  $("u").addEventListener("input",syncBuy); syncBuy();
   $("go").onclick=async()=>{
-    let {data,error}=await sb.rpc("mc_customer_buy",{p_trade_amount:rawNumber($("u").value),p_customer_name:$("n").value||null});
+    const isThb=currency.value==="THB";
+    const entered=rawNumber($("u").value);
+    if(entered<=0){$("modalMsg").textContent="Masukkan jumlah.";$("modalMsg").className="status err";return}
+    if(isThb&&thbRate<=0){$("modalMsg").textContent="Kurs USD → THB belum tersedia.";$("modalMsg").className="status err";return}
+    const usdAmount=isThb?entered/thbRate:entered;
+    let {data,error}=await sb.rpc("mc_customer_buy",{p_trade_amount:usdAmount,p_customer_name:$("n").value||null});
     if(error){$("modalMsg").textContent=error.message;$("modalMsg").className="status err";return}
-    const buyRate = Number((data&&data.customer_rate) || (data&&data.rate) || currentBuyRate());
-    $("modalMsg").textContent="Berhasil. Kurs "+idr(buyRate);$("modalMsg").className="status ok";await load();await hist()
+    const buyRate=Number((data&&data.customer_rate)||(data&&data.rate)||currentBuyRate());
+    $("modalMsg").textContent=isThb?"Berhasil. "+num(entered)+" THB diproses sebagai "+num(usdAmount)+" USD. Kurs "+idr(buyRate):"Berhasil. Kurs "+idr(buyRate);
+    $("modalMsg").className="status ok";await load();await hist();
   }
 };
 $("sellBtn").onclick=()=>{
-  modal("Customer jual USD",'<p class=muted>Customer memberikan USD, menerima IDR.</p><div class=field><label>Jumlah USD</label><input id=u inputmode=decimal autocomplete=off></div><div class=field><label>Kurs pasar USD/IDR</label><input id=r inputmode=decimal value="'+(market?Math.round(market):"")+'"></div><div class=field><label>Nama customer (opsional)</label><input id=n></div><button id=go class=primary>Proses</button>');
-  bindAmountInput("u");
+  modal("Customer jual",'<div class="field"><label>Mata uang yang dijual</label><select id="sellCurrency"><option value="USD">USD</option><option value="THB">THB</option></select></div><p id="sellHint" class="muted">Customer memberikan USD, menerima IDR.</p><div class="field"><label id="sellAmountLabel">Jumlah USD</label><input id="u" inputmode="decimal" autocomplete="off"></div><div class="field"><label>Kurs pasar USD/IDR</label><input id="r" inputmode="decimal" value="'+(market?Math.round(market):"")+'"></div><div id="sellUsdEq" class="muted"></div><div class="field"><label>Nama customer (opsional)</label><input id="n"></div><button id="go" class="primary">Proses</button>');
+  bindAmountInput("u"); bindAmountInput("r");
+  const currency=$("sellCurrency");
+  const syncSell=()=>{
+    const isThb=currency.value==="THB";
+    $("sellHint").textContent=isThb?"Customer memberikan THB, menerima IDR.":"Customer memberikan USD, menerima IDR.";
+    $("sellAmountLabel").textContent=isThb?"Jumlah THB":"Jumlah USD";
+    $("sellUsdEq").textContent=isThb?(thbRate>0?"Setara USD: "+num(rawNumber($("u").value)/thbRate)+" USD":"Kurs USD → THB belum tersedia."):"";
+  };
+  currency.onchange=syncSell;
+  $("u").addEventListener("input",syncSell); syncSell();
   $("go").onclick=async()=>{
-    let {data,error}=await sb.rpc("mc_customer_sell",{p_trade_amount:rawNumber($("u").value),p_market_rate:rawNumber($("r").value),p_customer_name:$("n").value||null});
+    const isThb=currency.value==="THB";
+    const entered=rawNumber($("u").value);
+    if(entered<=0){$("modalMsg").textContent="Masukkan jumlah.";$("modalMsg").className="status err";return}
+    if(isThb&&thbRate<=0){$("modalMsg").textContent="Kurs USD → THB belum tersedia.";$("modalMsg").className="status err";return}
+    const usdAmount=isThb?entered/thbRate:entered;
+    let {data,error}=await sb.rpc("mc_customer_sell",{p_trade_amount:usdAmount,p_market_rate:rawNumber($("r").value),p_customer_name:$("n").value||null});
     if(error){$("modalMsg").textContent=error.message;$("modalMsg").className="status err";return}
-    $("modalMsg").textContent="Berhasil. Kurs "+idr((data&&data.customer_rate)||round(rawNumber($("r").value)*(1-Number(settings.sell_margin))));$("modalMsg").className="status ok";await load();await hist()
+    const sellRate=Number((data&&data.customer_rate)||round(rawNumber($("r").value)*(1-Number(settings.sell_margin))));
+    $("modalMsg").textContent=isThb?"Berhasil. "+num(entered)+" THB diproses sebagai "+num(usdAmount)+" USD. Kurs "+idr(sellRate):"Berhasil. Kurs "+idr(sellRate);
+    $("modalMsg").className="status ok";await load();await hist();
   }
 };
 $("settingsBtn").onclick=()=>{modal("Pengaturan",'<div class=field><label>Mata uang modal</label><input id=b value="'+settings.base_currency+'"></div><div class=field><label>Mata uang utama</label><input id=t value="'+settings.trade_currency+'"></div><div class=field><label>Mata uang lokal</label><input id=l value="'+settings.local_currency+'"></div><div class=field><label>Margin beli (%)</label><input id=mb value="'+Number(settings.buy_margin)*100+'"></div><div class=field><label>Margin jual (%)</label><input id=ms value="'+Number(settings.sell_margin)*100+'"></div><div class=field><label>Profit jual USD per $1 (IDR)</label><input id=ca value="'+settings.capital_add_per_unit+'"></div><div class=field><label>Pembulatan kurs</label><input id=ru value="'+settings.rounding_unit+'"></div><div class=field><label>USD → KHR</label><input id=lr value="'+settings.usd_local_rate+'"></div><hr style="border-color:#292c2a;margin:16px 0"><div class=field><label>Nama Bank</label><input id=bn value="'+(settings.bank_name||"")+'" autocomplete="organization"></div><div class=field><label>Nomor Rekening</label><input id=ba value="'+(settings.bank_account_number||"")+'" inputmode="numeric" autocomplete="off"></div><div class=field><label>Atas Nama</label><input id=ban value="'+(settings.bank_account_name||"")+'" autocomplete="name"></div><button id=go class=primary>Simpan pengaturan</button><hr style="border-color:#292c2a;margin:16px 0"><div class=field><label>Mulai dari nol</label><div class="muted">Hapus semua transaksi, profit bulanan, dan saldo. Pengaturan tetap tersimpan.</div></div><button id=resetAllBtn style="width:100%;border-color:#8b3030;background:#3a1717;color:#ffb0b0">Hapus Semua Data / Mulai Baru</button>');$("go").onclick=async()=>{let p={base_currency:$("b").value.trim().toUpperCase(),trade_currency:$("t").value.trim().toUpperCase(),local_currency:$("l").value.trim().toUpperCase(),buy_margin:Number($("mb").value)/100,sell_margin:Number($("ms").value)/100,capital_add_per_unit:Number($("ca").value),rounding_unit:Number($("ru").value),usd_local_rate:Number($("lr").value),bank_name:$("bn").value.trim(),bank_account_number:$("ba").value.trim(),bank_account_name:$("ban").value.trim(),updated_at:new Date().toISOString()};let {error}=await sb.from("mc_settings").update(p).eq("user_id",user.id);if(error){$("modalMsg").textContent=error.message;$("modalMsg").className="status err";return}$("modal").classList.add("hidden");await load();await rates()}};document.addEventListener("click",async e=>{if(e.target&&e.target.id==="resetAllBtn"){
