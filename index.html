@@ -356,12 +356,22 @@ function currentBuyRate(){
   return basis?round(basis*(1+Number(settings.buy_margin))):0;
 }
 function currentSellRate(){ return market?Math.floor(market*(1-Number(settings.sell_margin))/Number(settings.rounding_unit||100))*Number(settings.rounding_unit||100):0; }
+function currentBuyThbRate(){
+  const usd=currentBuyRate();
+  return usd>0&&thbRate>0?Math.ceil(usd/thbRate):0;
+}
+function currentSellThbRate(){
+  const usd=currentSellRate();
+  return usd>0&&thbRate>0?Math.floor(usd/thbRate):0;
+}
 $("shareBuyBtn").onclick=()=>{
-  const text=`BELI\nRate : ${idr(currentBuyRate())} / Usd = ${thbRate?num(thbRate):"-"} Baht\n\nNAMA BANK: ${settings.bank_name||"-"}\nNOMOR REKENING: ${settings.bank_account_number||"-"}\nNAMA REKENING: ${settings.bank_account_name||"-"}`;
+  const buyThb=currentBuyThbRate();
+  const text=`BELI\nRate : ${idr(currentBuyRate())} / Usd = ${thbRate?num(thbRate):"-"} Baht\n1 Baht = ${buyThb?idr(buyThb):"-"}\n\nNAMA BANK: ${settings.bank_name||"-"}\nNOMOR REKENING: ${settings.bank_account_number||"-"}\nNAMA REKENING: ${settings.bank_account_name||"-"}`;
   shareText("Harga Beli USD",text);
 };
 $("shareSellBtn").onclick=()=>{
-  const text=`JUAL\nRate : ${idr(currentSellRate())} / Usd = ${thbRate?num(thbRate):"-"} Baht`;
+  const sellThb=currentSellThbRate();
+  const text=`JUAL\nRate : ${idr(currentSellRate())} / Usd = ${thbRate?num(thbRate):"-"} Baht\n1 Baht = ${sellThb?idr(sellThb):"-"}`;
   shareText("Harga Jual USD",text);
 };
 $("loginBtn").onclick=async()=>{let {data,error}=await sb.auth.signInWithPassword({email:$("email").value,password:$("password").value});$("loginMsg").textContent=error?error.message:"Berhasil masuk";if(!error)start(data.user)};
