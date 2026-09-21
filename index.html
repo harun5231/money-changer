@@ -145,7 +145,7 @@ function loadThbRate(){
   const thb=entries.reduce((a,x)=>a+(Number(x.thb)||0),0);
   const rate=usd>0?thb/usd:0;
   thbRate=rate>0?Math.floor((rate+1e-9)*10)/10:0;
-  $("thbRate").textContent=thbRate?num(thbRate):"—";
+  $("thbRate").textContent=thbRate?thbDisplay(thbRate):"—";
   $("deleteThbBtn").disabled=entries.length===0;
   $("deleteThbBtn").title=entries.length>0?"Hapus input USD → THB terakhir":"Belum ada input USD → THB";
 }
@@ -162,7 +162,7 @@ function deleteLastThb(){
   localStorage.setItem(thbStorageKey(),JSON.stringify({entries}));
   loadThbRate();
 }
-const $=x=>document.getElementById(x), idr=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(n)||0), num=n=>new Intl.NumberFormat("id-ID",{maximumFractionDigits:2}).format(Number(n)||0);
+const $=x=>document.getElementById(x), idr=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(n)||0), num=n=>new Intl.NumberFormat("id-ID",{maximumFractionDigits:2}).format(Number(n)||0), thbDisplay=n=>new Intl.NumberFormat("id-ID",{minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(n)||0);
 const typ=t=>({ADD_CAPITAL:"Tambah modal",INITIAL_CAPITAL:"Modal awal",CUSTOMER_BUY:"Customer beli USD",CUSTOMER_SELL:"Customer jual USD"}[t]||t);
 const round=x=>Math.round(x/Number(settings.rounding_unit||100))*Number(settings.rounding_unit||100);
 const formatInput=n=>{
@@ -366,12 +366,12 @@ function currentSellThbRate(){
 }
 $("shareBuyBtn").onclick=()=>{
   const buyThb=currentBuyThbRate();
-  const text=`BELI\nRate : ${idr(currentBuyRate())} / Usd = ${thbRate?num(thbRate):"-"} Baht\n1 Baht = ${buyThb?idr(buyThb):"-"}\n\nNAMA BANK: ${settings.bank_name||"-"}\nNOMOR REKENING: ${settings.bank_account_number||"-"}\nNAMA REKENING: ${settings.bank_account_name||"-"}`;
+  const text=`BELI\nRate : ${idr(currentBuyRate())} / Usd = ${thbRate?thbDisplay(thbRate):"-"} Baht\n1 Baht = ${buyThb?idr(buyThb):"-"}\n\nNAMA BANK: ${settings.bank_name||"-"}\nNOMOR REKENING: ${settings.bank_account_number||"-"}\nNAMA REKENING: ${settings.bank_account_name||"-"}`;
   shareText("Harga Beli USD",text);
 };
 $("shareSellBtn").onclick=()=>{
   const sellThb=currentSellThbRate();
-  const text=`JUAL\nRate : ${idr(currentSellRate())} / Usd = ${thbRate?num(thbRate):"-"} Baht\n1 Baht = ${sellThb?idr(sellThb):"-"}`;
+  const text=`JUAL\nRate : ${idr(currentSellRate())} / Usd = ${thbRate?thbDisplay(thbRate):"-"} Baht\n1 Baht = ${sellThb?idr(sellThb):"-"}`;
   shareText("Harga Jual USD",text);
 };
 $("loginBtn").onclick=async()=>{let {data,error}=await sb.auth.signInWithPassword({email:$("email").value,password:$("password").value});$("loginMsg").textContent=error?error.message:"Berhasil masuk";if(!error)start(data.user)};
