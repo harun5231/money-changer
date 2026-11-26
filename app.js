@@ -36,7 +36,7 @@ function render(){
  const b=state.balance,s=state.settings,m=reference();
  $("rateSource").textContent=auto?"KURS OTOMATIS":"KURS GOOGLE";$("fxCredit").classList.toggle("hidden",!auto);
  const stamp=m?new Date(auto?fx.at:s.google_set_at).toLocaleString("id-ID",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";
- const vals={baseBal:L.idr(b.base_amount),cashIdr:L.idr(b.cash_idr),tradeBal:L.fmt(b.trade_amount)+" LKR",lkrHand:L.fmt(b.lkr_in_hand)+" LKR",profit:L.idr(b.profit_month_idr),basis:L.basis(state)?L.rate(L.basis(state)):"—",buyRate:buyQuote()?L.rate(buyQuote()):"—",sellRate:sellQuote()?L.rate(sellQuote()):"—",marketRate:m?"Rp "+L.fmt(m,6):"—",rateMsg:auto?(m?stamp:fxLoading?"Memuat…":"Data belum tersedia"):(m?"Manual · "+stamp:"Pilih sumber kurs")};
+ const vals={baseBal:L.idr(b.base_amount),cashIdr:L.idr(b.cash_idr),tradeBal:L.fmt(b.trade_amount)+" LKR",lkrHand:L.fmt(b.lkr_in_hand)+" LKR",profit:L.idr(b.profit_month_idr),basis:L.basis(state)?L.rate(L.basis(state)):"—",buyRate:buyQuote()?L.rate(buyQuote()):"—",sellRate:sellQuote()?L.rate(sellQuote()):"—",marketRate:m?"Rp "+L.fmt(m,6):"—",rateMsg:auto?(fxLoading?"Memuat…":m?stamp:"Data belum tersedia"):(m?"Manual · "+stamp:"Pilih sumber kurs")};
  for(const [k,v] of Object.entries(vals))$(k).textContent=v;
 }
 function modal(title,help,fields,action,cb){
@@ -72,17 +72,15 @@ for(const [id,type,title] of [["buyBtn","CUSTOMER_SELL","Beli LKR dari customer"
  };
 }
 $("refreshRate").onclick=()=>{
- if(auto){
-  const box=modal("Kurs otomatis LKR → IDR","Sumber: ExchangeRate.dev, bukan Google. Kurs acuan terlambat sekitar 15 menit. Harga jual = kurs acuan − 1,5%.");
-  const refresh=E("button","Perbarui sekarang"),google=E("button","Kembali ke Google manual");
-  refresh.onclick=()=>{close();refreshAuto(true)};
-  google.onclick=()=>{try{chooseAuto(false)}catch(e){$("modalMsg").textContent=e.message}};
-  box.append(refresh,E("br"),google);return;
- }
- modal("Kurs Google LKR → IDR","Buka Google Finance dan masukkan angka untuk 1 LKR. Kurs di sini tidak berubah otomatis.",[field("rate","IDR per 1 LKR",L.google(state))],"Simpan kurs Google",e=>{
+ if(auto){refreshAuto(true);return;}
+ showGoogleRate();
+};
+function showGoogleRate(){
+ modal("Kurs Google LKR → IDR","Masukkan angka untuk 1 LKR.",[field("rate","IDR per 1 LKR",L.google(state))],"Simpan kurs Google",e=>{
   const x=L.parseGoogle(e.rate.value);
   change(d=>{d.settings.google_rate=x;d.settings.google_set_at=new Date().toISOString();d.settings.market_mode="google"});
-  notice("Kurs Google yang kau masukkan sudah disimpan.");
+  if(auto){localStorage.setItem(autoKey,"google");auto=false;render()}
+  notice("Kurs Google disimpan.");
  });
  const box=$("modalBody"),p=E("p"),source=E("a","Buka Google Finance (LKR → IDR)");
  source.href=googleURL;source.target="_blank";source.rel="noopener noreferrer";source.style.color="var(--text)";
@@ -90,13 +88,17 @@ $("refreshRate").onclick=()=>{
  const opt=E("button","Pakai kurs otomatis (bukan Google)");
  opt.type="button";opt.style.marginTop="12px";
  opt.onclick=()=>{try{chooseAuto(true)}catch(e){$("modalMsg").textContent=e.message}};
- box.append(opt,E("p","ExchangeRate.dev · gratis · jeda sekitar 15 menit. Angkanya bisa berbeda dari Google."));
+ box.append(opt,E("p","ExchangeRate.dev · jeda ±15 menit."));
 };
 $("settingsBtn").onclick=()=>{
  const s=state.settings;
  modal("Pengaturan","Kurs beli dari customer: kurs pasar dikurangi margin. Kurs jual ke customer: kurs acuan dikurangi tetap 1,5%, dibulatkan ke dua desimal. Kurs dasar modal tetap ditampilkan sebagai pembanding.",[field("bm","Margin beli (%)",100*s.buy_margin),field("u","Pembulatan kurs beli (IDR)",s.rounding_unit),["bank","Nama bank",s.bank_name,null,"text"],["acc","Nomor rekening",s.bank_account_number,null,"text"],["holder","Atas nama",s.bank_account_name,null,"text"]],"Simpan",e=>{
  change(d=>Object.assign(d.settings,{buy_margin:val(e,"bm")/100,rounding_unit:val(e,"u"),bank_name:e.bank.value.trim(),bank_account_number:e.acc.value.trim(),bank_account_name:e.holder.value.trim()}));notice("Pengaturan tersimpan.");
  });
+ if(auto){
+  const mode=E("button","Kurs Google manual");mode.type="button";mode.style.marginTop="12px";
+  mode.onclick=showGoogleRate;$("modalBody").append(mode);
+ }
 };
 const showHistory=(title,customer)=>{
  const box=modal(title,"");
