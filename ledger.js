@@ -38,7 +38,7 @@ const parseGoogle=val=>{
 };
 const google=d=>d.settings.market_mode==="google"&&d.settings.google_set_at?d.settings.google_rate:0;
 const buy=(d,market=d.settings.market)=>money(Math.floor((market*(1-d.settings.buy_margin)+1e-9)/d.settings.rounding_unit)*d.settings.rounding_unit,2);
-const sell=(d,market=d.settings.market)=>money(Math.ceil((market*(1+d.settings.sell_margin)-1e-9)/d.settings.rounding_unit)*d.settings.rounding_unit,2);
+const sell=(d,market=d.settings.market)=>money(market*985/1000,2);
 const rate=x=>"Rp "+fmt(x,2);
 const capital=(d,base,lkr,at=new Date().toISOString())=>{
  ok(number(base)&&number(lkr)&&Number.isInteger(base)&&money(lkr,2)===lkr,"Modal IDR harus bulat; LKR maksimal dua desimal.");

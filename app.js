@@ -68,8 +68,8 @@ $("refreshRate").onclick=()=>{
 };
 $("settingsBtn").onclick=()=>{
  const s=state.settings;
- modal("Pengaturan","Kurs beli dari customer: kurs pasar dikurangi margin. Kurs jual ke customer: kurs Google yang kau masukkan ditambah margin. Kurs dasar modal tetap ditampilkan sebagai pembanding.",[field("bm","Margin beli (%)",100*s.buy_margin),field("sm","Margin jual (%)",100*s.sell_margin),field("u","Pembulatan kurs (IDR)",s.rounding_unit),["bank","Nama bank",s.bank_name,null,"text"],["acc","Nomor rekening",s.bank_account_number,null,"text"],["holder","Atas nama",s.bank_account_name,null,"text"]],"Simpan",e=>{
- change(d=>Object.assign(d.settings,{buy_margin:val(e,"bm")/100,sell_margin:val(e,"sm")/100,rounding_unit:val(e,"u"),bank_name:e.bank.value.trim(),bank_account_number:e.acc.value.trim(),bank_account_name:e.holder.value.trim()}));notice("Pengaturan tersimpan.");
+ modal("Pengaturan","Kurs beli dari customer: kurs pasar dikurangi margin. Kurs jual ke customer: kurs Google dikurangi tetap 1,5%, dibulatkan ke dua desimal. Kurs dasar modal tetap ditampilkan sebagai pembanding.",[field("bm","Margin beli (%)",100*s.buy_margin),field("u","Pembulatan kurs beli (IDR)",s.rounding_unit),["bank","Nama bank",s.bank_name,null,"text"],["acc","Nomor rekening",s.bank_account_number,null,"text"],["holder","Atas nama",s.bank_account_name,null,"text"]],"Simpan",e=>{
+ change(d=>Object.assign(d.settings,{buy_margin:val(e,"bm")/100,rounding_unit:val(e,"u"),bank_name:e.bank.value.trim(),bank_account_number:e.acc.value.trim(),bank_account_name:e.holder.value.trim()}));notice("Pengaturan tersimpan.");
  });
 };
 const showHistory=(title,customer)=>{
