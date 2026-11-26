@@ -6,7 +6,7 @@ const autoKey="money-changer-lkr-auto-source-v1";
 let auto=false,fx=null,fxLoading=false,tappedAt=0;
 try{auto=localStorage.getItem(autoKey)==="exchangerate.dev"}catch{}
 const reference=()=>auto?(FX.eligible(fx)?fx.rate:0):L.google(state);
-const buyQuote=()=>L.buy(state,reference()),sellQuote=()=>L.sell(state,reference());
+const buyQuote=()=>L.buy(state,reference()),sellQuote=()=>Math.round(L.sell(state,reference()));
 async function refreshAuto(force=false){
  if(!state||!auto||fxLoading||(!force&&Date.now()-tappedAt<120000))return;
  tappedAt=Date.now();fxLoading=true;render();
@@ -60,9 +60,9 @@ const field=(name,label,n)=>[name,label,n==null||n===0?"":L.fmt(n,6)];
 const val=(els,k,negative=false)=>L.parse(els[k].value,negative);
 $("fresh").onclick=()=>{try{save(L.create());notice("Buku LKR baru dibuat. Masukkan modal untuk mulai.");refreshAuto()}catch(e){notice(e.message)}};
 $("capitalBtn").onclick=()=>modal("Tambah Modal","Masukkan jumlah yang benar-benar kau tambahkan ke kas atau stok.",[field("a","Modal IDR"),field("u","Modal LKR")],"Simpan",e=>{change(d=>L.capital(d,val(e,"a"),val(e,"u")));notice("Modal tersimpan.")});
-for(const [id,type,title] of [["buyBtn","CUSTOMER_SELL","Beli LKR dari customer"],["sellBtn","CUSTOMER_BUY","Jual LKR ke customer"]]){
+for(const [id,type,title] of [["buyBtn","CUSTOMER_BUY","Customer beli LKR"],["sellBtn","CUSTOMER_SELL","Customer jual LKR"]]){
  $(id).onclick=()=>{
- const weBuy=type==="CUSTOMER_SELL", quote=weBuy?buyQuote():sellQuote();
+ const weBuy=type==="CUSTOMER_SELL", quote=weBuy?sellQuote():buyQuote();
  const els=modal(title,"Isi IDR yang benar-benar "+(weBuy?"kau bayarkan.":"kau terima.")+" Profit diisi manual (kosong berarti nol).",[field("qty","Jumlah LKR"),field("cash",weBuy?"IDR dibayar":"IDR diterima"),field("p","Profit IDR (opsional, boleh negatif)"),["n","Nama customer (opsional)","",null,"text"]],"Catat transaksi",e=>{
   change(d=>L.exchange(d,{type,amount:val(e,"qty"),paid:val(e,"cash"),profit:val(e,"p",true),name:e.n.value.trim()}));notice("Transaksi LKR tersimpan.")
  });
@@ -88,11 +88,11 @@ function showGoogleRate(){
  const opt=E("button","Pakai kurs otomatis (bukan Google)");
  opt.type="button";opt.style.marginTop="12px";
  opt.onclick=()=>{try{chooseAuto(true)}catch(e){$("modalMsg").textContent=e.message}};
- box.append(opt,E("p","ExchangeRate.dev · jeda ±15 menit."));
+ box.append(opt,E("p","Jeda ±15 menit."));
 };
 $("settingsBtn").onclick=()=>{
  const s=state.settings;
- modal("Pengaturan","Kurs beli dari customer: kurs pasar dikurangi margin. Kurs jual ke customer: kurs acuan dikurangi tetap 1,5%, dibulatkan ke dua desimal. Kurs dasar modal tetap ditampilkan sebagai pembanding.",[field("bm","Margin beli (%)",100*s.buy_margin),field("u","Pembulatan kurs beli (IDR)",s.rounding_unit),["bank","Nama bank",s.bank_name,null,"text"],["acc","Nomor rekening",s.bank_account_number,null,"text"],["holder","Atas nama",s.bank_account_name,null,"text"]],"Simpan",e=>{
+ modal("Pengaturan","Kurs jual berlaku saat customer menjual LKR ke kau. Harga ditampilkan dalam rupiah bulat.",[field("bm","Margin beli (%)",100*s.buy_margin),field("u","Pembulatan kurs beli (IDR)",s.rounding_unit),["bank","Nama bank",s.bank_name,null,"text"],["acc","Nomor rekening",s.bank_account_number,null,"text"],["holder","Atas nama",s.bank_account_name,null,"text"]],"Simpan",e=>{
  change(d=>Object.assign(d.settings,{buy_margin:val(e,"bm")/100,rounding_unit:val(e,"u"),bank_name:e.bank.value.trim(),bank_account_number:e.acc.value.trim(),bank_account_name:e.holder.value.trim()}));notice("Pengaturan tersimpan.");
  });
  if(auto){
@@ -106,7 +106,7 @@ const showHistory=(title,customer)=>{
  if(!list.length)box.append(E("p","Belum ada transaksi."));
  for(const t of list){
   const item=E("div");item.className="history-item entry";
-  const label={INITIAL_CAPITAL:"Modal awal",ADD_CAPITAL:"Tambah modal",CUSTOMER_BUY:"Jual LKR ke customer",CUSTOMER_SELL:"Beli LKR dari customer"}[t.transaction_type];
+  const label={INITIAL_CAPITAL:"Modal awal",ADD_CAPITAL:"Tambah modal",CUSTOMER_BUY:"Customer beli LKR",CUSTOMER_SELL:"Customer jual LKR"}[t.transaction_type];
   item.append(E("strong",label+(t.customer_name?" · "+t.customer_name:"")),E("p",L.idr(t.base_amount)+" · "+L.fmt(t.trade_amount,6)+" LKR"),E("small",new Date(t.created_at).toLocaleString("id-ID")+(t.customer_rate?" · "+L.rate(t.customer_rate)+"/LKR":"")));
   box.append(item)
  }
