@@ -2,19 +2,18 @@
 <html lang="id">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Money Changer</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script>
+<meta http-equiv="Content-Security-Policy" content="default-src none; script-src 'self'; style-src 'unsafe-inline'; img-src 'self' data:; manifest-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'"><title>Money Changer Pribadi</title><meta name="theme-color" content="#050a0e"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="manifest" href="./manifest.webmanifest">
 <style>
 :root{--bg:#050a0e;--card:#0b151d;--line:#294153;--text:#f7f9fb;--muted:#9eacb8;--green:#16e58c;--red:#ff4153;--blue:#1787ff;--purple:#663cff;--orange:#ff9b25}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#050a0e;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif}body{font-size:14px}body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 50% -12%,rgba(17,70,91,.34),transparent 42%);z-index:-1}
 header{padding:10px 14px 8px;background:rgba(5,10,14,.96);border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;z-index:5}.head{display:flex;align-items:center;gap:10px;max-width:700px;margin:auto;min-width:0}.brand-mark{font-size:31px;line-height:.75;color:#10e29a;text-shadow:0 0 16px rgba(16,226,154,.35);font-weight:900;flex:0 0 auto}h1{font-size:20px;letter-spacing:.01em;margin:0;font-weight:850;white-space:nowrap}.head-right{margin-left:auto;display:flex;align-items:center;gap:9px;min-width:0}.datebox{display:none;text-align:right;font-size:11px;color:#dce5ee}.datebox strong{display:block;font-size:16px;margin-top:3px;color:#fff}.avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#173b67,#10243c);border:1px solid #275487;font-size:16px;font-weight:800;flex:0 0 auto}.head button{padding:8px 12px;font-size:12px}
 main{max-width:700px;margin:auto;padding:8px 12px 18px}.panel,.card{background:linear-gradient(145deg,rgba(12,29,40,.97),rgba(7,16,23,.97));border:1px solid var(--line);box-shadow:0 8px 24px rgba(0,0,0,.22);border-radius:16px}.panel{padding:11px}.card{padding:11px;min-width:0}.label{font-size:9px;line-height:1.12;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:800}.big{font-size:18px;font-weight:850;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.muted{color:var(--muted);font-size:11px}.rate-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.money-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}.action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.shortcut-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
-.rate-card{position:relative;overflow:hidden;min-width:0}.rate-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--green)}.rate-card.rate-sell:before{background:var(--red)}.rate-card.small:before{background:var(--blue)}.rate-card.auto:before{background:#18dba0}.thb-card:before{background:var(--orange)}
- .rate-card.rate-buy,.rate-card.rate-sell{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;column-gap:8px;min-height:100px;padding:10px 10px 10px 12px}.rate-card.rate-buy{background:linear-gradient(135deg,rgba(0,103,67,.48),rgba(6,22,25,.96));border-color:#09bd7a}.rate-card.rate-sell{background:linear-gradient(135deg,rgba(113,14,27,.58),rgba(13,17,25,.96));border-color:#d52b40}.rate-icon{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:900;flex:0 0 34px}.rate-buy .rate-icon{background:rgba(10,221,141,.11);border:1px solid rgba(10,221,141,.45);color:#12e99a}.rate-sell .rate-icon{background:rgba(255,56,75,.11);border:1px solid rgba(255,56,75,.48);color:#ff4356}.rate-content{min-width:0;overflow:hidden}.rate-card .label{font-size:8px;letter-spacing:.075em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rate-card .big{font-size:clamp(17px,4.2vw,21px);line-height:1.05;letter-spacing:-.03em;white-space:nowrap;overflow:hidden;text-overflow:clip}.rate-card .subline{font-size:10px;line-height:1.15;color:#d5dee6;margin-top:3px;white-space:nowrap}.rate-card.small{display:flex;align-items:center;min-height:88px;padding:10px;gap:8px}.rate-card.small .rate-icon{width:34px;height:34px;font-size:20px;flex:0 0 34px}.rate-card.small .big{font-size:clamp(16px,3.7vw,19px)}.rate-head{display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:7px;width:100%;min-width:0}.rate-head .rate-icon{width:34px;height:34px;font-size:20px;flex:0 0 34px}.rate-head .rate-content{min-width:0}.rate-head .label{white-space:nowrap}.rate-head .big{font-size:clamp(16px,3.6vw,19px)}.rate-head .subline{font-size:9px}.rate-head .muted{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}.rate-head .refresh{flex:0 0 auto;min-width:50px;padding:6px 7px!important;font-size:9px!important}.thb-card{grid-column:1/-1;display:flex!important;align-items:center;gap:9px;min-height:78px;padding:10px 12px}.thb-card .thb-icon{width:38px;height:38px;flex:0 0 38px;border-radius:50%;background:linear-gradient(#fff 0 20%,#e21d37 20% 37%,#173b7a 37% 63%,#e21d37 63% 80%,#fff 80%);border:2px solid #f04a58}.thb-card .big{color:var(--orange);font-size:clamp(17px,4vw,21px)}
-.money-card{min-width:0;min-height:92px;padding:11px 12px}.hand-card{min-height:112px}.hand-thb{display:flex;flex-direction:column;align-items:flex-start;gap:2px;margin-top:7px;padding-top:6px;border-top:1px solid rgba(255,255,255,.09);min-width:0}.hand-thb span{font-size:8px;line-height:1.1;letter-spacing:.07em;color:#c7bba8;font-weight:800;white-space:nowrap}.hand-thb strong{font-size:13px;line-height:1.1;color:#ffd08a;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:clip}.money-card.purple{border-color:#7140ff;background:linear-gradient(145deg,rgba(71,21,145,.5),rgba(9,24,44,.97))}.money-card.blue{border-color:#1477ff;background:linear-gradient(145deg,rgba(9,71,159,.48),rgba(7,22,39,.97))}.money-card.orange{border-color:#db841e;background:linear-gradient(145deg,rgba(125,71,9,.5),rgba(31,24,12,.97))}.money-card.green{border-color:#10b979;background:linear-gradient(145deg,rgba(0,100,69,.5),rgba(7,27,23,.97))}.money-card .big{font-size:clamp(17px,4vw,21px);letter-spacing:-.02em;text-overflow:clip}
+.rate-card{position:relative;overflow:hidden;min-width:0}.rate-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--green)}.rate-card.rate-sell:before{background:var(--red)}.rate-card.small:before{background:var(--blue)}.rate-card.auto:before{background:#18dba0}
+ .rate-card.rate-buy,.rate-card.rate-sell{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;column-gap:8px;min-height:100px;padding:10px 10px 10px 12px}.rate-card.rate-buy{background:linear-gradient(135deg,rgba(0,103,67,.48),rgba(6,22,25,.96));border-color:#09bd7a}.rate-card.rate-sell{background:linear-gradient(135deg,rgba(113,14,27,.58),rgba(13,17,25,.96));border-color:#d52b40}.rate-icon{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:900;flex:0 0 34px}.rate-buy .rate-icon{background:rgba(10,221,141,.11);border:1px solid rgba(10,221,141,.45);color:#12e99a}.rate-sell .rate-icon{background:rgba(255,56,75,.11);border:1px solid rgba(255,56,75,.48);color:#ff4356}.rate-content{min-width:0;overflow:hidden}.rate-card .label{font-size:8px;letter-spacing:.075em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rate-card .big{font-size:clamp(17px,4.2vw,21px);line-height:1.05;letter-spacing:-.03em;white-space:nowrap;overflow:hidden;text-overflow:clip}.rate-card .subline{font-size:10px;line-height:1.15;color:#d5dee6;margin-top:3px;white-space:nowrap}.rate-card.small{display:flex;align-items:center;min-height:88px;padding:10px;gap:8px}.rate-card.small .rate-icon{width:34px;height:34px;font-size:20px;flex:0 0 34px}.rate-card.small .big{font-size:clamp(16px,3.7vw,19px)}.rate-head{display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:7px;width:100%;min-width:0}.rate-head .rate-icon{width:34px;height:34px;font-size:20px;flex:0 0 34px}.rate-head .rate-content{min-width:0}.rate-head .label{white-space:nowrap}.rate-head .big{font-size:clamp(16px,3.6vw,19px)}.rate-head .subline{font-size:9px}.rate-head .muted{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}.rate-head .refresh{flex:0 0 auto;min-width:50px;padding:6px 7px!important;font-size:9px!important}
+.money-card{min-width:0;min-height:92px;padding:11px 12px}.hand-card{min-height:112px}.money-card.purple{border-color:#7140ff;background:linear-gradient(145deg,rgba(71,21,145,.5),rgba(9,24,44,.97))}.money-card.blue{border-color:#1477ff;background:linear-gradient(145deg,rgba(9,71,159,.48),rgba(7,22,39,.97))}.money-card.orange{border-color:#db841e;background:linear-gradient(145deg,rgba(125,71,9,.5),rgba(31,24,12,.97))}.money-card.green{border-color:#10b979;background:linear-gradient(145deg,rgba(0,100,69,.5),rgba(7,27,23,.97))}.money-card .big{font-size:clamp(17px,4vw,21px);letter-spacing:-.02em;text-overflow:clip}
 .action{min-width:0;border:1px solid rgba(255,255,255,.08);background:#172631;border-radius:14px;padding:9px 10px;color:#fff;font-weight:800;display:flex;align-items:center;gap:8px;justify-content:center;min-height:62px;font-size:14px}.action.primary{background:linear-gradient(135deg,#00a96d,#087b52);border-color:#0cda8c}.action.sell{background:linear-gradient(135deg,#c9273b,#8b1d2d);border-color:#ef4254}.action .ico{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-size:23px;background:rgba(255,255,255,.13);flex:0 0 42px}.capital-action{width:100%;margin-top:8px!important;background:linear-gradient(135deg,#075dd0,#0c62da)!important;border-color:#1e7fff!important;min-height:64px}.share-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}.share{background:linear-gradient(135deg,#4020b7,#2444bd);border-color:#754dff}.share .ico{font-size:18px}.shortcut{min-height:112px;justify-content:center;text-align:center;flex-direction:column;gap:7px;font-size:12px;background:linear-gradient(145deg,rgba(11,35,54,.95),rgba(8,22,31,.98));position:relative;padding:10px}.shortcut:nth-child(2){border-color:#168bb5}.shortcut:nth-child(3){border-color:#08a56d;background:linear-gradient(145deg,rgba(0,74,57,.45),rgba(8,27,29,.98))}.shortcut:nth-child(4){border-color:#c97920;background:linear-gradient(145deg,rgba(82,49,15,.45),rgba(27,25,18,.98))}.shortcut .ico{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:rgba(20,117,190,.25);font-size:20px}.shortcut .txt{display:flex;flex-direction:column;gap:2px;align-items:center;line-height:1.1}.shortcut .txt small{font-size:8px;color:#aebbc4;font-weight:500;line-height:1.1}.shortcut:after{content:"›";position:absolute;right:8px;bottom:7px;font-size:21px;color:#dce7ef}
 button,input{font:inherit}button{padding:9px 11px;border-radius:10px;border:1px solid #33413a;background:#17201c;color:#fff;font-weight:750;cursor:pointer}button.primary{background:#0a8e59;border-color:#0dbd75}button:active{transform:scale(.98)}input{width:100%;padding:11px;border-radius:10px;border:1px solid #33413a;background:#090e0c;color:#fff}.field{margin:10px 0}.field label{display:block;color:#b8c2bd;font-size:12px;margin-bottom:5px}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1;min-width:130px}.status{padding:9px;margin:9px 0;border-radius:10px;background:#0d1411;color:#aeb9b3;font-size:12px}.err{color:#ff9090}.ok{color:#55d99b}table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:9px 5px;border-bottom:1px solid #25302b}th{color:#89958f;font-weight:600}.history-list{display:flex;flex-direction:column}.history-item{padding:11px 0;border-bottom:1px solid #25302b}.history-item:last-child{border-bottom:0}.history-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.history-type{font-weight:750}.history-time{color:#78857f;font-size:10px;white-space:nowrap}.history-details{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:7px}.history-detail .label{font-size:8px}.history-value{font-weight:750;margin-top:3px;overflow-wrap:anywhere}.hidden{display:none!important}.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:20;display:flex;align-items:flex-end;backdrop-filter:blur(5px)}.modalbox{width:min(620px,100%);max-height:88vh;overflow:auto;background:linear-gradient(145deg,#121a17,#090e0c);border:1px solid #2a3831;border-radius:20px 20px 0 0;padding:15px;box-shadow:0 -12px 40px rgba(0,0,0,.5)}.modalbox .row{display:flex;align-items:center;justify-content:space-between;gap:10px}.modalbox .row>*{flex:initial}.modalbox h2{font-size:17px}.close-btn{padding:7px 10px;font-size:11px}.login-card{margin-top:35px}.login-card h2{font-size:20px;margin-bottom:12px}.login-card .actions button{min-width:0}
-@media(max-width:390px){.hand-card{min-height:108px}.hand-thb{margin-top:6px;padding-top:5px}.hand-thb strong{font-size:12px}main{padding-left:9px;padding-right:9px}.brand-mark{font-size:29px}h1{font-size:19px}.rate-card.rate-buy,.rate-card.rate-sell{grid-template-columns:42px minmax(0,1fr);column-gap:8px;min-height:102px;padding:10px}.rate-card.rate-buy .rate-icon,.rate-card.rate-sell .rate-icon{width:42px;height:42px;font-size:23px}.rate-card .big{font-size:18px}.rate-card.small .big{font-size:16px}.rate-head .big{font-size:15px}.money-card .big{font-size:16px}.action{font-size:13px}.action .ico{width:38px;height:38px;flex-basis:38px;font-size:21px}.shortcut{font-size:11px}.shortcut .ico{width:38px;height:38px;font-size:18px}.shortcut .txt small{font-size:7px}}
+@media(max-width:390px){.hand-card{min-height:108px}main{padding-left:9px;padding-right:9px}.brand-mark{font-size:29px}h1{font-size:19px}.rate-card.rate-buy,.rate-card.rate-sell{grid-template-columns:42px minmax(0,1fr);column-gap:8px;min-height:102px;padding:10px}.rate-card.rate-buy .rate-icon,.rate-card.rate-sell .rate-icon{width:42px;height:42px;font-size:23px}.rate-card .big{font-size:18px}.rate-card.small .big{font-size:16px}.rate-head .big{font-size:15px}.money-card .big{font-size:16px}.action{font-size:13px}.action .ico{width:38px;height:38px;flex-basis:38px;font-size:21px}.shortcut{font-size:11px}.shortcut .ico{width:38px;height:38px;font-size:18px}.shortcut .txt small{font-size:7px}}
 
 
 /* Final compact mobile layout: icons never consume the number column. */
@@ -43,9 +42,9 @@ button,input{font:inherit}button{padding:9px 11px;border-radius:10px;border:1px 
   .rate-head .refresh{min-width:47px;padding:6px 5px!important;font-size:8px!important}
   .rate-head .subline{font-size:8px}
   .rate-head .muted{display:none}
-  .thb-card{min-height:72px!important;padding:9px 10px}
-  .thb-card .thb-icon{width:34px;height:34px;flex-basis:34px}
-  .thb-card .big{font-size:18px}
+
+
+
   .money-card{min-height:86px;padding:10px}
   .money-card .big{font-size:17px}
   .action{min-height:54px;font-size:12px}
@@ -63,10 +62,10 @@ button,input{font:inherit}button{padding:9px 11px;border-radius:10px;border:1px 
 .auto-refresh-card .big{font-size:clamp(17px,3.7vw,21px)!important;line-height:1.05!important;overflow:visible!important;text-overflow:clip!important;white-space:nowrap!important;}
 .auto-refresh-card .subline{font-size:10px!important;white-space:nowrap!important;}
 .auto-refresh-card .muted{font-size:9px!important;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;}
-.thb-card{gap:9px!important;}
-.thb-card .rate-content{flex:1;min-width:0;}
-.thb-delete{flex:0 0 auto!important;padding:6px 8px!important;font-size:9px!important;border-radius:8px!important;background:#38161b!important;border-color:#a73342!important;color:#ff9eaa!important;}
-.thb-delete:disabled{opacity:.35;cursor:not-allowed;}
+
+
+
+
 @media(max-width:390px){
  .auto-refresh-card{padding:9px!important;}
  .auto-refresh-card .rate-head{grid-template-columns:31px minmax(0,1fr);gap:6px;}
@@ -75,7 +74,7 @@ button,input{font:inherit}button{padding:9px 11px;border-radius:10px;border:1px 
  .auto-refresh-card .big{font-size:16px!important;}
  .auto-refresh-card .subline{font-size:9px!important;}
  .auto-refresh-card .muted{font-size:8px!important;}
- .thb-delete{padding:5px 7px!important;font-size:8px!important;}
+
 }
 
 /* FINAL HISTORY + SHARE DISPLAY FIX — visual only */
@@ -101,317 +100,21 @@ button,input{font:inherit}button{padding:9px 11px;border-radius:10px;border:1px 
   .history-capital .history-details{grid-template-columns:repeat(2,minmax(0,1fr))}
   .history-value{font-size:13px}
 }
-</style>
+.field input,.field select{font-size:16px}.status{overflow-wrap:anywhere}#welcome h2,#backupBox h2{margin:.25em 0}.inline-help{color:var(--muted);line-height:1.4}.entry{margin-bottom:12px}.empty{font-size:15px;color:var(--muted)}#notice:empty{display:none}.money-card .big{white-space:normal;overflow-wrap:anywhere}.hand-card{min-height:92px}</style>
 </head>
 <body>
-<header><div class="head"><div class="brand-mark">↔</div><h1>MONEY CHANGER</h1><div class="head-right"><div class="datebox"><span id="todayDate">18 Sep 2026</span><strong id="todayTime">22:11</strong></div><div class="avatar">HN</div><button id="logout" class="hidden">Keluar</button></div></div></header>
-<main>
-<section id="login" class="panel login-card"><h2>Masuk</h2><div class="field"><label>Email</label><input id="email" type="email" autocomplete="email"></div><div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password"></div><div class="actions"><button id="loginBtn" class="primary">Masuk</button><button id="signupBtn">Buat akun</button></div><div id="loginMsg" class="status"></div></section>
+<header><div class="head"><div class="brand-mark">↔</div><h1>MONEY CHANGER</h1><div class="head-right"><div class="datebox"><span id="todayDate">18 Sep 2026</span><strong id="todayTime">22:11</strong></div><div class="avatar">HN</div></div></div></header>
+<main><p role="status" id="notice" class="status">Membaca catatan di perangkat ini…</p><section id="welcome" class="panel hidden"><h2>Money Changer LKR ↔ IDR</h2><p>Catatan disimpan di browser ini, bukan di server. Kalau data browser terhapus atau pindah HP, pulihkan dari cadangan JSON.</p><div class="actions"><button id="fresh" class="primary">Mulai buku LKR</button><button id="welcomeImport">Impor cadangan LKR</button></div></section>
 <section id="app" class="hidden"><div class="rate-grid">
-<div class="card rate-card rate-buy"><div class="rate-icon">↗</div><div class="rate-content"><div class="label">KURS BELI USD</div><div id="buyRate" class="big green">Rp0</div><div class="subline">dari customer</div></div></div>
-<div class="card rate-card rate-sell"><div class="rate-icon">↓</div><div class="rate-content"><div class="label">KURS JUAL USD</div><div id="sellRate" class="big red">Rp0</div><div class="subline">ke customer</div></div></div>
-<div class="card rate-card small"><div class="rate-icon base-icon">↻</div><div class="rate-content"><div class="label">KURS DASAR</div><div id="basis" class="big blue">Rp0</div><div class="subline">per 1 USD</div></div></div>
-<button id="refreshRate" class="card rate-card small auto auto-refresh-card" type="button" aria-label="Refresh kurs otomatis"><div class="rate-head"><div class="rate-icon auto-icon">↻</div><div class="rate-content"><div class="label">KURS OTOMATIS</div><div id="marketRate" class="big purple">Memuat...</div><div class="subline">per 1 USD</div><div id="rateMsg" class="muted">Tap kartu untuk refresh</div></div></div></button>
-<div class="card rate-card small thb-card"><div class="rate-icon thb-icon"></div><div class="rate-content"><div class="label">USD → THB</div><div id="thbRate" class="big orange">—</div><div class="subline">THB per 1 USD</div></div><button id="deleteThbBtn" class="thb-delete" type="button" title="Hapus input USD → THB terakhir">Hapus</button></div></div>
-<div class="money-grid"><div class="card money-card purple"><div class="label">TOTAL MODAL (IDR)</div><div id="baseBal" class="big">Rp0</div></div><div class="card money-card blue"><div class="label">TOTAL USD</div><div id="tradeBal" class="big">$0</div></div><div class="card money-card orange hand-card"><div class="label">USD DI TANGAN</div><div id="usdHand" class="big">$0</div><div class="hand-thb"><span>THB DI TANGAN</span><strong id="thbHand">0 THB</strong></div></div><div class="card money-card green"><div class="label">PROFIT BULAN INI</div><div id="profit" class="big">Rp0</div></div></div>
-<div class="action-grid" style="margin-top:10px"><button id="buyBtn" class="action primary"><span class="ico">↗</span><span>Customer<br>Beli USD</span></button><button id="sellBtn" class="action sell"><span class="ico">↓</span><span>Customer<br>Jual USD</span></button></div>
+<div class="card rate-card rate-buy"><div class="rate-icon">↗</div><div class="rate-content"><div class="label">KURS BELI LKR</div><div id="buyRate" class="big green">Rp0</div><div class="subline">dari customer</div></div></div>
+<div class="card rate-card rate-sell"><div class="rate-icon">↓</div><div class="rate-content"><div class="label">KURS JUAL LKR</div><div id="sellRate" class="big red">Rp0</div><div class="subline">ke customer</div></div></div>
+<div class="card rate-card small"><div class="rate-icon base-icon">↻</div><div class="rate-content"><div class="label">KURS DASAR MODAL</div><div id="basis" class="big blue">Rp0</div><div class="subline">IDR per 1 LKR</div></div></div>
+<button id="refreshRate" class="card rate-card small auto auto-refresh-card" type="button" aria-label="Buka Google Finance dan isi kurs LKR ke IDR"><div class="rate-head"><div class="rate-icon auto-icon">↻</div><div class="rate-content"><div class="label">KURS GOOGLE</div><div id="marketRate" class="big purple">Memuat...</div><div class="subline">IDR per 1 LKR</div><div id="rateMsg" class="muted">Ketuk untuk isi</div></div></div></button>
+<div class="money-grid"><div class="card money-card purple"><div class="label">MODAL IDR</div><div id="baseBal" class="big">Rp0</div><div class="subline">Kas: <span id="cashIdr">Rp0</span></div></div><div class="card money-card blue"><div class="label">MODAL LKR</div><div id="tradeBal" class="big">0 LKR</div></div><div class="card money-card orange hand-card"><div class="label">LKR DI TANGAN</div><div id="lkrHand" class="big">0 LKR</div></div><div class="card money-card green"><div class="label">PROFIT BULAN INI</div><div id="profit" class="big">Rp0</div></div></div>
+<div class="action-grid" style="margin-top:10px"><button id="buyBtn" class="action primary"><span class="ico">↗</span><span>Beli LKR<br>dari customer</span></button><button id="sellBtn" class="action sell"><span class="ico">↓</span><span>Jual LKR<br>ke customer</span></button></div>
 <button id="capitalBtn" class="action capital-action"><span class="ico">＋</span><span>Tambah Modal</span></button>
 <div class="share-actions"><button id="shareBuyBtn" class="action share"><span class="ico">●</span><span>Bagikan Kurs Beli</span></button><button id="shareSellBtn" class="action share"><span class="ico">●</span><span>Bagikan Kurs Jual</span></button></div>
-<div class="shortcut-grid"><button id="customerHistoryBtn" class="action shortcut"><span class="ico">▤</span><span class="txt">Riwayat<br>Transaksi Customer<small>Lihat transaksi beli & jual</small></span></button><button id="capitalHistoryBtn" class="action shortcut"><span class="ico">▣</span><span class="txt">Riwayat<br>Tambah Modal<small>Lihat modal yang masuk</small></span></button><button id="profitHistoryBtn" class="action shortcut"><span class="ico">▥</span><span class="txt">Profit Bulanan<small>Riwayat bulan yang ditutup</small></span></button><button id="settingsBtn" class="action shortcut"><span class="ico">⚙</span><span class="txt">Pengaturan<small>Rate, bank & reset</small></span></button></div>
-<div class="hidden"><button id="resetBtn">Reset / Tutup Bulan</button><button id="reload">Refresh</button><button id="reloadProfit">Refresh</button><div id="history"></div><div id="profitHistory"></div><div id="localRate">0</div></div></section></main>
+<div class="shortcut-grid"><button id="customerHistoryBtn" class="action shortcut"><span class="ico">▤</span><span class="txt">Riwayat<br>Transaksi Customer<small>Lihat transaksi beli & jual</small></span></button><button id="capitalHistoryBtn" class="action shortcut"><span class="ico">▣</span><span class="txt">Riwayat<br>Tambah Modal<small>Lihat modal yang masuk</small></span></button><button id="profitHistoryBtn" class="action shortcut"><span class="ico">▥</span><span class="txt">Profit Bulanan<small>Riwayat bulan yang ditutup</small></span></button><button id="settingsBtn" class="action shortcut"><span class="ico">⚙</span><span class="txt">Pengaturan<small>Kurs, margin & rekening</small></span></button></div>
+<section id="backupBox" class="panel" style="margin-top:12px"><h2>Cadangan data</h2><p class="muted">Simpan file cadangan di File/iCloud Drive. Data tidak sinkron antarperangkat.</p><div class="actions"><button id="exportBtn">Unduh cadangan</button><button id="importBtn">Impor cadangan LKR</button></div></section></section><input type="file" accept=".json,application/json" id="importFile" hidden></main>
 <div id="modal" class="modal hidden"><div class="modalbox"><div class="row"><h2 id="modalTitle">Form</h2><button id="close" class="close-btn">Tutup</button></div><div id="modalBody"></div><div id="modalMsg" class="status"></div></div></div>
-<script>
-const {createClient}=supabase, sb=createClient(MC_CONFIG.SUPABASE_URL,MC_CONFIG.SUPABASE_PUBLISHABLE_KEY);let user,settings,balance,market=0;
-let thbRate=0;
-function thbStorageKey(){return user ? "mc_usd_thb_entries_"+user.id : "mc_usd_thb_entries"}
-function readThbEntries(){
-  const key=thbStorageKey();
-  let d={entries:[]};
-  try{d=JSON.parse(localStorage.getItem(key)||"{}")}catch(e){}
-  if(!Array.isArray(d.entries)){
-    // Migrate the previous THB-only storage without touching Supabase balances.
-    let old={};
-    try{old=JSON.parse(localStorage.getItem(user?"mc_usd_thb_totals_"+user.id:"mc_usd_thb_totals")||"{}")}catch(e){}
-    const usd=Number(d.usd)||Number(old.usd)||0;
-    const thb=Number(d.thb)||Number(old.thb)||0;
-    d={entries:usd>0&&thb>0?[{usd,thb,legacy:true}]:[]};
-    localStorage.setItem(key,JSON.stringify(d));
-  }
-  return d.entries.filter(x=>(Number(x.usd)||0)>0&&(Number(x.thb)||0)>0);
-}
-function updateThbHand(){
-  const usd=Number(balance?.usd_in_hand)||0;
-  const value=usd>0&&thbRate>0?usd*thbRate:0;
-  const el=$("thbHand");
-  if(el)el.textContent=value>0?thbDisplay(value)+" THB":"0 THB";
-}
-function loadThbRate(){
-  const entries=readThbEntries();
-  const usd=entries.reduce((a,x)=>a+(Number(x.usd)||0),0);
-  const thb=entries.reduce((a,x)=>a+(Number(x.thb)||0),0);
-  const rate=usd>0?thb/usd:0;
-  thbRate=rate>0?Math.floor((rate+1e-9)*10)/10:0;
-  $("thbRate").textContent=thbRate?thbDisplay(thbRate):"—";
-  updateThbHand();
-  $("deleteThbBtn").disabled=entries.length===0;
-  $("deleteThbBtn").title=entries.length>0?"Hapus input USD → THB terakhir":"Belum ada input USD → THB";
-}
-function saveThbTotals(usd,thb){
-  const entries=readThbEntries();
-  entries.push({usd:Number(usd)||0,thb:Number(thb)||0,at:new Date().toISOString()});
-  localStorage.setItem(thbStorageKey(),JSON.stringify({entries}));
-  loadThbRate();
-}
-function deleteLastThb(){
-  const entries=readThbEntries();
-  if(!entries.length)return;
-  entries.pop();
-  localStorage.setItem(thbStorageKey(),JSON.stringify({entries}));
-  loadThbRate();
-}
-const $=x=>document.getElementById(x), idr=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(n)||0), num=n=>new Intl.NumberFormat("id-ID",{maximumFractionDigits:2}).format(Number(n)||0), thbDisplay=n=>new Intl.NumberFormat("id-ID",{minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(n)||0);
-const typ=t=>({ADD_CAPITAL:"Tambah modal",INITIAL_CAPITAL:"Modal awal",CUSTOMER_BUY:"Customer beli USD",CUSTOMER_SELL:"Customer jual USD"}[t]||t);
-const round=x=>Math.round(x/Number(settings.rounding_unit||100))*Number(settings.rounding_unit||100);
-const formatInput=n=>{
-  const s=String(n??"").replace(/[^0-9,.-]/g,"");
-  if(!s)return "";
-  const neg=s.startsWith("-")?"-":"", clean=s.replace(/-/g,""), parts=clean.split(",");
-  const intPart=(parts[0]||"").replace(/\./g,"").replace(/^0+(?=\d)/,"")||"0";
-  const grouped=intPart.replace(/\B(?=(\d{3})+(?!\d))/g,".");
-  return neg+grouped+(parts.length>1?","+parts.slice(1).join("").replace(/[^0-9]/g,""):"");
-};
-const rawNumber=v=>{
-  const s=String(v??"").trim().replace(/\s/g,"");
-  if(!s)return 0;
-  const normalized=s.includes(",")?s.replace(/\./g,"").replace(",","."):s.replace(/\./g,"");
-  return Number(normalized)||0;
-};
-const bindAmountInput=id=>{
-  const el=$(id); if(!el)return;
-  el.addEventListener("input",()=>{const pos=el.selectionStart;const before=el.value;const raw=before.replace(/[^0-9,]/g,"");el.value=formatInput(raw);});
-  el.addEventListener("blur",()=>{el.value=formatInput(el.value)});
-};
-async function repairKnownThbCorruption(){
-  // One-time repair for the exact corrupted state shown in the user's current screen.
-  // THB reference data must never be part of mc_balances. This only repairs TOTAL USD;
-  // TOTAL IDR is left untouched. The target restores the intended customer-buy rate to Rp17,900.
-  if(!user||!balance) return;
-  const key="mc_thb_balance_repaired_v1_"+user.id;
-  if(localStorage.getItem(key)==="1") return;
-  const base=Number(balance.base_amount)||0;
-  const trade=Number(balance.trade_amount)||0;
-  if(base===24157737 && trade===268){
-    const {error}=await sb.from("mc_balances").update({trade_amount:1363,updated_at:new Date().toISOString()}).eq("user_id",user.id);
-    if(error) throw error;
-    localStorage.setItem(key,"1");
-  } else {
-    localStorage.setItem(key,"1");
-  }
-}
-async function load(){/* THB reference is local-only and never changes mc_balances. */ let s=await sb.from("mc_settings").select("*").single(),b=await sb.from("mc_balances").select("*").single();if(s.error||b.error)throw Error((s.error||b.error).message);settings=s.data;balance=b.data;let basis=Number(balance.trade_amount)>0?Number(balance.base_amount)/Number(balance.trade_amount):0;$("baseBal").textContent=idr(balance.base_amount);$("tradeBal").textContent="$"+num(balance.trade_amount);$("usdHand").textContent="$"+num(balance.usd_in_hand);updateThbHand();$("profit").textContent=idr(balance.profit_month_idr);$("basis").textContent=idr(basis)+"/USD";$("localRate").textContent=num(settings.usd_local_rate);$("buyRate").textContent=basis?idr(round(basis*(1+Number(settings.buy_margin)) )):"Rp0";if(market)$("sellRate").textContent=idr(Math.floor(market*(1-Number(settings.sell_margin))/Number(settings.rounding_unit||100))*Number(settings.rounding_unit||100));}
-async function hist(filter="all"){
-  let {data,error}=await sb.from("mc_transactions").select("*").order("created_at",{ascending:false}).limit(50);
-  const box=$("history");
-  if(error){box.innerHTML=`<div class="status err">${error.message}</div>`;return;}
-  let rows=data||[];
-  if(filter==="customer") rows=rows.filter(x=>x.transaction_type==="CUSTOMER_BUY"||x.transaction_type==="CUSTOMER_SELL");
-  if(filter==="capital") rows=rows.filter(x=>x.transaction_type==="ADD_CAPITAL"||x.transaction_type==="INITIAL_CAPITAL");
-  if(!rows.length){box.innerHTML='<div class="muted">Belum ada data</div>';return;}
-  const esc=v=>String(v??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
-  box.innerHTML=rows.map(x=>{
-    const isCustomer=x.transaction_type==="CUSTOMER_BUY"||x.transaction_type==="CUSTOMER_SELL";
-    const rate=Number(x.customer_rate)||0;
-    const shownIdr=x.transaction_type==="CUSTOMER_BUY"&&rate?Math.abs(Number(x.trade_amount)||0)*rate:Number(x.base_amount)||0;
-    const usd=num(x.trade_amount);const idrValue=idr(shownIdr);const kurs=rate?idr(rate):"-";
-    const thb=isCustomer&&thbRate>0?num(Math.abs(Number(x.trade_amount)||0)*thbRate)+" THB":"-";
-    const time=new Date(x.created_at).toLocaleString("id-ID",{day:"numeric",month:"numeric",year:"numeric",hour:"2-digit",minute:"2-digit"});
-    const name=isCustomer&&x.customer_name?`<div class="history-name">${esc(x.customer_name)}</div>`:"";
-    return `<div class="history-item ${isCustomer?'history-customer':'history-capital'}"><div class="history-top"><div><div class="history-type">${typ(x.transaction_type)}</div>${name}</div><div class="history-time">${time}</div></div><div class="history-details"><div class="history-detail"><div class="label">USD</div><div class="history-value">${usd}</div></div><div class="history-detail"><div class="label">IDR</div><div class="history-value">${idrValue}</div></div><div class="history-detail"><div class="label">Kurs</div><div class="history-value">${kurs}</div></div><div class="history-detail"><div class="label">THB</div><div class="history-value">${thb}</div></div></div></div>`;
-  }).join("");
-}
-
-async function profitHistory(){let {data,error}=await sb.from("mc_monthly_profit").select("*").eq("user_id",user.id).order("period_start",{ascending:false});$("profitHistory").innerHTML=error?`<tr><td colspan=3 class=err>${error.message}</td></tr>`:(data||[]).map(x=>`<tr><td>${new Date(x.period_start+"T00:00:00").toLocaleDateString("id-ID",{month:"long",year:"numeric"})}</td><td>${idr(x.profit_idr)}</td><td>${new Date(x.closed_at).toLocaleString("id-ID")}</td></tr>`).join("")||'<tr><td colspan=3 class=muted>Belum ada bulan yang ditutup</td></tr>';}
-
-let rateTimer=null;
-function parseGoogleIdr(text){
-  const m=String(text||"").match(/Dolar Amerika Serikat\s*\/\s*Rupiah Indonesia[\s\S]{0,220}?([0-9]{1,3}(?:\.[0-9]{3})*(?:,[0-9]+)?)/i);
-  if(!m)return 0;
-  const v=m[1].replace(/\./g,"").replace(",",".");
-  return Number(v)||0;
-}
-async function googleFinanceRate(){
-  const target="https://www.google.com/finance/quote/USD-IDR?hl=id";
-  const urls=[
-    target,
-    "https://r.jina.ai/http://www.google.com/finance/quote/USD-IDR?hl=id"
-  ];
-  for(const url of urls){
-    try{
-      const r=await fetch(url,{cache:"no-store",headers:{"Accept":"text/html,text/plain,*/*"}});
-      if(!r.ok)continue;
-      const text=await r.text();
-      const value=parseGoogleIdr(text);
-      if(value>10000&&value<30000)return value;
-    }catch(e){}
-  }
-  return 0;
-}
-async function rates(){
-  try{
-    let value=await googleFinanceRate();
-    let source="Google Finance";
-    if(!value){
-      const r=await fetch("https://api.exchangerate.dev/v1/latest/USD?symbols=IDR",{cache:"no-store",headers:{"Accept":"application/json"}});
-      if(!r.ok)throw Error("HTTP "+r.status);
-      const j=await r.json();
-      value=Number(j.rates?.IDR)||0;
-      source="Market";
-    }
-    if(!value)throw Error("Rate tidak tersedia");
-    market=value;
-    $("marketRate").textContent=idr(market)+"/USD";
-    $("rateMsg").textContent=source+" • tap untuk refresh";
-    $("sellRate").textContent=idr(currentSellRate());
-  }catch(e){
-    $("marketRate").textContent=market?idr(market)+"/USD":"Gagal memuat";
-    $("rateMsg").textContent=market?"Kurs terakhir • tap untuk refresh":"Koneksi kurs gagal";
-    $("sellRate").textContent=market?idr(currentSellRate()):"Rp0";
-  }
-}
-function startRateTimer(){if(rateTimer)clearInterval(rateTimer);rateTimer=setInterval(rates,60000)}
-function modal(t,b){$("modalTitle").textContent=t;$("modalBody").innerHTML=b;$("modalMsg").textContent="";$("modalMsg").className="status";$("modal").classList.remove("hidden")}$("close").onclick=()=>$("modal").classList.add("hidden");
-$("capitalBtn").onclick=()=>{
-  modal("Modal awal / tambah modal",'<div class=field><label>IDR</label><input id=a inputmode=decimal autocomplete=off></div><div class=field><label>USD</label><input id=u inputmode=decimal autocomplete=off></div><div class=field><label>USD yang ditukar ke THB</label><input id=thbUsd inputmode=decimal autocomplete=off placeholder="Contoh: 100"></div><div class=field><label>THB yang diterima</label><input id=thbCash inputmode=decimal autocomplete=off placeholder="Contoh: 3320"></div><button id=go class=primary>Simpan</button>');
-  bindAmountInput("a");bindAmountInput("u");bindAmountInput("thbUsd");bindAmountInput("thbCash");
-  $("go").onclick=async()=>{
-    const base=rawNumber($("a").value),usdCapital=rawNumber($("u").value),thbUsd=rawNumber($("thbUsd").value),thbCash=rawNumber($("thbCash").value);
-    if((thbUsd>0)!==(thbCash>0)){$("modalMsg").textContent="Isi USD dan THB bersama-sama.";$("modalMsg").className="status err";return}
-    if(base<=0&&usdCapital<=0&&thbUsd<=0){$("modalMsg").textContent="Isi modal IDR/USD atau USD dan THB.";$("modalMsg").className="status err";return}
-    if(base>0||usdCapital>0){
-      let {error}=await sb.rpc("mc_add_capital",{p_base_amount:base,p_trade_amount:usdCapital});
-      if(error){$("modalMsg").textContent=error.message;$("modalMsg").className="status err";return}
-    }
-    if(thbUsd>0&&thbCash>0){saveThbTotals(thbUsd,thbCash);}
-    $("modal").classList.add("hidden");await load();await hist();loadThbRate();
-  }
-};
-$("buyBtn").onclick=()=>{
-  modal("Customer beli",'<div class="field"><label>Mata uang yang dibeli</label><select id="buyCurrency"><option value="USD">USD</option><option value="THB">THB</option></select></div><p id="buyHint" class="muted">Customer memberikan IDR, menerima USD.</p><div class="field"><label id="buyAmountLabel">Jumlah USD</label><input id="u" inputmode="decimal" autocomplete="off"></div><div id="buyUsdEq" class="muted"></div><div class="field"><label>Nama customer (opsional)</label><input id="n"></div><button id="go" class="primary">Proses</button>');
-  bindAmountInput("u");
-  const currency=$("buyCurrency");
-  const syncBuy=()=>{
-    const isThb=currency.value==="THB";
-    $("buyHint").textContent=isThb?"Customer memberikan IDR, menerima THB.":"Customer memberikan IDR, menerima USD.";
-    $("buyAmountLabel").textContent=isThb?"Jumlah THB":"Jumlah USD";
-    $("buyUsdEq").textContent=isThb?(thbRate>0?"Setara USD: "+num(rawNumber($("u").value)/thbRate)+" USD":"Kurs USD → THB belum tersedia."):"";
-  };
-  currency.onchange=syncBuy;
-  $("u").addEventListener("input",syncBuy); syncBuy();
-  $("go").onclick=async()=>{
-    const isThb=currency.value==="THB";
-    const entered=rawNumber($("u").value);
-    if(entered<=0){$("modalMsg").textContent="Masukkan jumlah.";$("modalMsg").className="status err";return}
-    if(isThb&&thbRate<=0){$("modalMsg").textContent="Kurs USD → THB belum tersedia.";$("modalMsg").className="status err";return}
-    const usdAmount=isThb?entered/thbRate:entered;
-    let {data,error}=await sb.rpc("mc_customer_buy",{p_trade_amount:usdAmount,p_customer_name:$("n").value||null});
-    if(error){$("modalMsg").textContent=error.message;$("modalMsg").className="status err";return}
-    const buyRate=Number((data&&data.customer_rate)||(data&&data.rate)||currentBuyRate());
-    $("modalMsg").textContent=isThb?"Berhasil. "+num(entered)+" THB diproses sebagai "+num(usdAmount)+" USD. Kurs "+idr(buyRate):"Berhasil. Kurs "+idr(buyRate);
-    $("modalMsg").className="status ok";await load();await hist();
-  }
-};
-$("sellBtn").onclick=()=>{
-  modal("Customer jual",'<div class="field"><label>Mata uang yang dijual</label><select id="sellCurrency"><option value="USD">USD</option><option value="THB">THB</option></select></div><p id="sellHint" class="muted">Customer memberikan USD, menerima IDR.</p><div class="field"><label id="sellAmountLabel">Jumlah USD</label><input id="u" inputmode="decimal" autocomplete="off"></div><div class="field"><label>Kurs pasar USD/IDR</label><input id="r" inputmode="decimal" value="'+(market?Math.round(market):"")+'"></div><div id="sellUsdEq" class="muted"></div><div class="field"><label>Nama customer (opsional)</label><input id="n"></div><button id="go" class="primary">Proses</button>');
-  bindAmountInput("u"); bindAmountInput("r");
-  const currency=$("sellCurrency");
-  const syncSell=()=>{
-    const isThb=currency.value==="THB";
-    $("sellHint").textContent=isThb?"Customer memberikan THB, menerima IDR.":"Customer memberikan USD, menerima IDR.";
-    $("sellAmountLabel").textContent=isThb?"Jumlah THB":"Jumlah USD";
-    $("sellUsdEq").textContent=isThb?(thbRate>0?"Setara USD: "+num(rawNumber($("u").value)/thbRate)+" USD":"Kurs USD → THB belum tersedia."):"";
-  };
-  currency.onchange=syncSell;
-  $("u").addEventListener("input",syncSell); syncSell();
-  $("go").onclick=async()=>{
-    const isThb=currency.value==="THB";
-    const entered=rawNumber($("u").value);
-    if(entered<=0){$("modalMsg").textContent="Masukkan jumlah.";$("modalMsg").className="status err";return}
-    if(isThb&&thbRate<=0){$("modalMsg").textContent="Kurs USD → THB belum tersedia.";$("modalMsg").className="status err";return}
-    const usdAmount=isThb?entered/thbRate:entered;
-    let {data,error}=await sb.rpc("mc_customer_sell",{p_trade_amount:usdAmount,p_market_rate:rawNumber($("r").value),p_customer_name:$("n").value||null});
-    if(error){$("modalMsg").textContent=error.message;$("modalMsg").className="status err";return}
-    const sellRate=Number((data&&data.customer_rate)||round(rawNumber($("r").value)*(1-Number(settings.sell_margin))));
-    $("modalMsg").textContent=isThb?"Berhasil. "+num(entered)+" THB diproses sebagai "+num(usdAmount)+" USD. Kurs "+idr(sellRate):"Berhasil. Kurs "+idr(sellRate);
-    $("modalMsg").className="status ok";await load();await hist();
-  }
-};
-$("settingsBtn").onclick=()=>{modal("Pengaturan",'<div class=field><label>Mata uang modal</label><input id=b value="'+settings.base_currency+'"></div><div class=field><label>Mata uang utama</label><input id=t value="'+settings.trade_currency+'"></div><div class=field><label>Mata uang lokal</label><input id=l value="'+settings.local_currency+'"></div><div class=field><label>Margin beli (%)</label><input id=mb value="'+Number(settings.buy_margin)*100+'"></div><div class=field><label>Margin jual (%)</label><input id=ms value="'+Number(settings.sell_margin)*100+'"></div><div class=field><label>Profit jual USD per $1 (IDR)</label><input id=ca value="'+settings.capital_add_per_unit+'"></div><div class=field><label>Pembulatan kurs</label><input id=ru value="'+settings.rounding_unit+'"></div><div class=field><label>USD → KHR</label><input id=lr value="'+settings.usd_local_rate+'"></div><hr style="border-color:#292c2a;margin:16px 0"><div class=field><label>Nama Bank</label><input id=bn value="'+(settings.bank_name||"")+'" autocomplete="organization"></div><div class=field><label>Nomor Rekening</label><input id=ba value="'+(settings.bank_account_number||"")+'" inputmode="numeric" autocomplete="off"></div><div class=field><label>Atas Nama</label><input id=ban value="'+(settings.bank_account_name||"")+'" autocomplete="name"></div><button id=go class=primary>Simpan pengaturan</button><hr style="border-color:#292c2a;margin:16px 0"><div class=field><label>Mulai dari nol</label><div class="muted">Hapus semua transaksi, profit bulanan, dan saldo. Pengaturan tetap tersimpan.</div></div><button id=resetAllBtn style="width:100%;border-color:#8b3030;background:#3a1717;color:#ffb0b0">Hapus Semua Data / Mulai Baru</button>');$("go").onclick=async()=>{let p={base_currency:$("b").value.trim().toUpperCase(),trade_currency:$("t").value.trim().toUpperCase(),local_currency:$("l").value.trim().toUpperCase(),buy_margin:Number($("mb").value)/100,sell_margin:Number($("ms").value)/100,capital_add_per_unit:Number($("ca").value),rounding_unit:Number($("ru").value),usd_local_rate:Number($("lr").value),bank_name:$("bn").value.trim(),bank_account_number:$("ba").value.trim(),bank_account_name:$("ban").value.trim(),updated_at:new Date().toISOString()};let {error}=await sb.from("mc_settings").update(p).eq("user_id",user.id);if(error){$("modalMsg").textContent=error.message;$("modalMsg").className="status err";return}$("modal").classList.add("hidden");await load();await rates()}};document.addEventListener("click",async e=>{if(e.target&&e.target.id==="resetAllBtn"){
-  if(!confirm("PERINGATAN: Semua transaksi, profit bulanan, dan saldo akan dihapus. Pengaturan tetap tersimpan. Lanjutkan?"))return;
-  if(!confirm("KONFIRMASI TERAKHIR: Data lama benar-benar akan dihapus. Lanjutkan?"))return;
-  let {error}=await sb.rpc("mc_reset_all_data");
-  if(error){$("modalMsg").textContent=error.message;$("modalMsg").className="status err";return}
-  alert("Semua data berhasil dihapus. Masukkan modal baru untuk mulai nyata.");
-  $("modal").classList.add("hidden");await load();await hist();await profitHistory();
-}});
-function shareText(title,text){
-  if(navigator.share){ navigator.share({title,text}).catch(()=>{}); }
-  else if(navigator.clipboard){ navigator.clipboard.writeText(text).then(()=>alert("Pesan disalin. Silakan tempel ke aplikasi pilihan Anda.")); }
-  else { prompt("Salin pesan ini:",text); }
-}
-function currentBuyRate(){
-  const basis=Number(balance?.trade_amount)>0?Number(balance.base_amount)/Number(balance.trade_amount):0;
-  return basis?round(basis*(1+Number(settings.buy_margin))):0;
-}
-function currentSellRate(){ return market?Math.floor(market*(1-Number(settings.sell_margin))/Number(settings.rounding_unit||100))*Number(settings.rounding_unit||100):0; }
-function currentBuyThbRate(){
-  const usd=currentBuyRate();
-  return usd>0&&thbRate>0?Math.ceil(usd/thbRate):0;
-}
-function currentSellThbRate(){
-  const usd=currentSellRate();
-  return usd>0&&thbRate>0?Math.floor(usd/thbRate):0;
-}
-$("shareBuyBtn").onclick=()=>{
-  const buyThb=currentBuyThbRate();
-  const text=`BELI\nRate : ${idr(currentBuyRate())} / Usd = ${thbRate?thbDisplay(thbRate):"-"} Baht\n1 Baht = ${buyThb?idr(buyThb):"-"}\n\nNAMA BANK: ${settings.bank_name||"-"}\nNOMOR REKENING: ${settings.bank_account_number||"-"}\nNAMA REKENING: ${settings.bank_account_name||"-"}`;
-  shareText("Harga Beli USD",text);
-};
-$("shareSellBtn").onclick=()=>{
-  const sellThb=currentSellThbRate();
-  const text=`JUAL\nRate : ${idr(currentSellRate())} / Usd = ${thbRate?thbDisplay(thbRate):"-"} Baht\n1 Baht = ${sellThb?idr(sellThb):"-"}`;
-  shareText("Harga Jual USD",text);
-};
-$("loginBtn").onclick=async()=>{let {data,error}=await sb.auth.signInWithPassword({email:$("email").value,password:$("password").value});$("loginMsg").textContent=error?error.message:"Berhasil masuk";if(!error)start(data.user)};
-$("signupBtn").onclick=async()=>{let {data,error}=await sb.auth.signUp({email:$("email").value,password:$("password").value});$("loginMsg").textContent=error?error.message:(data.session?"Akun dibuat":"Akun dibuat, cek email verifikasi")};
-$("logout").onclick=async()=>{await sb.auth.signOut();location.reload()};$("refreshRate").onclick=async()=>{const msg=$("rateMsg");if(msg)msg.textContent="Memuat kurs Google...";await rates();};$("deleteThbBtn").onclick=()=>{const entries=readThbEntries();if(!entries.length)return;if(confirm("Hapus input USD → THB terakhir? Kurs akumulasi akan dihitung ulang."))deleteLastThb();};$("reload").onclick=hist;$("reloadProfit").onclick=profitHistory;
-$("resetBtn").onclick=async()=>{if(!confirm("Tutup bulan dan reset Total IDR, Total USD, USD di Tangan, serta Profit Bulan Ini? Riwayat tetap tersimpan."))return;let {data,error}=await sb.rpc("mc_reset_month");if(error)return alert("Gagal reset: "+error.message);alert("Bulan ditutup. Profit sebelumnya: "+idr(data.previous_profit_idr));await load();await hist();await profitHistory();};
-async function start(u){user=u;$("login").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");try{await load();await repairKnownThbCorruption();if(Number(balance?.trade_amount)===268 && Number(balance?.base_amount)===24157737) await load();await hist();await profitHistory();loadThbRate();await rates();startRateTimer()}catch(e){alert("Database belum siap: "+e.message)}}
-sb.auth.getSession().then(x=>{if(x.data.session)start(x.data.session.user)});function updateHeaderClock(){const d=new Date();const months=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];$('todayDate').textContent=d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();$('todayTime').textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}updateHeaderClock();setInterval(updateHeaderClock,30000);
-
-function openHistory(title,filter){
-  modal(title,'<div id="historyModalBox" class="history-list"><div class="muted">Memuat...</div></div>');
-  const old=history; // keep existing renderer untouched
-  hist(filter).then(()=>{$("historyModalBox").innerHTML=$("history").innerHTML;}).catch(e=>{$("historyModalBox").innerHTML=`<div class="status err">${e.message}</div>`;});
-}
-$("customerHistoryBtn").onclick=()=>openHistory("Riwayat Transaksi Customer","customer");
-$("capitalHistoryBtn").onclick=()=>openHistory("Riwayat Tambah Modal","capital");
-$("profitHistoryBtn").onclick=()=>{
-  modal("Profit Bulanan",'<div style="overflow:auto"><table><thead><tr><th>Bulan</th><th>Profit</th><th>Ditutup</th></tr></thead><tbody id="profitModalTable"><tr><td colspan="3" class="muted">Memuat...</td></tr></tbody></table></div>');
-  profitHistory().then(()=>{$("profitModalTable").innerHTML=$("profitHistory").innerHTML;});
-};
-$("settingsBtn").onclick=(()=>$("settingsBtn").onclick)();
-const _oldSettingsBtnHandler=$("settingsBtn").onclick;
-$("settingsBtn").onclick=()=>{_oldSettingsBtnHandler();setTimeout(()=>{
-  const body=$("modalBody"); if(!body)return;
-  const sep=document.createElement("hr");sep.style.cssText="border-color:#25302b;margin:14px 0";
-  const btn=document.createElement("button");btn.id="resetMonthInside";btn.className="primary";btn.style.width="100%";btn.textContent="Tutup Bulan / Reset Profit";
-  body.appendChild(sep);body.appendChild(btn);
-},0)};
-document.addEventListener("click",async e=>{if(e.target&&e.target.id==="resetMonthInside"){
-  if(!confirm("Tutup bulan dan reset Total IDR, Total USD, USD di Tangan, serta Profit Bulan Ini? Riwayat tetap tersimpan."))return;
-  let {data,error}=await sb.rpc("mc_reset_month");
-  if(error){$("modalMsg").textContent=error.message;$("modalMsg").className="status err";return;}
-  alert("Bulan ditutup. Profit sebelumnya: "+idr(data.previous_profit_idr));
-  $("modal").classList.add("hidden");await load();await hist();await profitHistory();
-}});
-</script></body></html>
+<script src="./ledger.js" defer></script><script src="./app.js" defer></script></body></html>
