@@ -104,18 +104,29 @@ for(const [id,type,title] of [["buyBtn","CUSTOMER_BUY","Customer beli LKR"],["se
  const els=modal(title,null,[field("qty","Jumlah LKR"),field("cash",weBuy?"IDR dibayar":"IDR diterima"),["n","Nama customer (opsional)","",null,"text"]],"Catat transaksi",e=>{
   change(d=>L.exchange(d,{type,amount:val(e,"qty"),paid:val(e,"cash"),profit:0,name:e.n.value.trim()}));notice("Transaksi LKR tersimpan.")
  });
- let generated=null;
- els.cash.addEventListener("input",()=>{generated=null});
+ let derived=null;
+ const setAmount=(name,value)=>{
+  const input=els[name];input.value=value;input.dataset.plainAmount=value.replaceAll(".","");
+  derived=value?name:null;
+ };
+ const clearDerived=name=>{if(derived===name)setAmount(name,"")};
+ els.cash.addEventListener("input",()=>{
+  if(derived==="cash")derived=null;
+  if(weBuy)return;
+  let idr=0;try{idr=val(els,"cash")}catch{}
+  const rate=buyQuote();
+  if(!rate||idr<=0||!Number.isInteger(idr)){clearDerived("qty");return}
+  const cents=(BigInt(idr)*100n+rate/2n)/rate;
+  const decimals=String(cents%100n).padStart(2,"0").replace(/0+$/,"");
+  setAmount("qty",cents?L.fmt(cents/100n,0)+(decimals?","+decimals:""):"");
+ });
  els.qty.addEventListener("input",()=>{
+  if(derived==="qty")derived=null;
   let amount=0;try{amount=val(els,"qty")}catch{}
   const rate=weBuy?sellQuote():buyQuote();
-  if(!rate||amount<=0||Number(amount.toFixed(2))!==amount){
-   if(generated!==null){els.cash.value="";els.cash.dataset.plainAmount="";generated=null}
-   return;
-  }
+  if(!rate||amount<=0||Number(amount.toFixed(2))!==amount){clearDerived("cash");return}
   const total=(BigInt(Math.round(amount*100))*BigInt(rate)+50n)/100n;
-  generated=L.fmt(total,0);
-  els.cash.value=generated;els.cash.dataset.plainAmount=generated.replaceAll(".","");
+  setAmount("cash",L.fmt(total,0));
  });
  };
 }
