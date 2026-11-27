@@ -70,14 +70,10 @@ $("fresh").onclick=()=>{try{save(L.create());notice("Buku LKR baru dibuat. Masuk
 $("capitalBtn").onclick=()=>modal("Tambah Modal","Masukkan jumlah yang benar-benar kau tambahkan ke kas atau stok.",[field("a","Modal IDR"),field("u","Modal LKR")],"Simpan",e=>{change(d=>L.capital(d,val(e,"a"),val(e,"u")));notice("Modal tersimpan.")});
 for(const [id,type,title] of [["buyBtn","CUSTOMER_BUY","Customer beli LKR"],["sellBtn","CUSTOMER_SELL","Customer jual LKR"]]){
  $(id).onclick=()=>{
- const weBuy=type==="CUSTOMER_SELL", quote=weBuy?sellQuote():buyQuote();
- const els=modal(title,weBuy?null:"Isi IDR yang benar-benar kau terima. Profit diisi manual (kosong berarti nol).",[field("qty","Jumlah LKR"),field("cash",weBuy?"IDR dibayar":"IDR diterima"),...(weBuy?[]:[field("p","Profit IDR (opsional, boleh negatif)")]),["n","Nama customer (opsional)","",null,"text"]],"Catat transaksi",e=>{
-  change(d=>L.exchange(d,{type,amount:val(e,"qty"),paid:val(e,"cash"),profit:weBuy?0:val(e,"p",true),name:e.n.value.trim()}));notice("Transaksi LKR tersimpan.")
+ const weBuy=type==="CUSTOMER_SELL";
+ modal(title,null,[field("qty","Jumlah LKR"),field("cash",weBuy?"IDR dibayar":"IDR diterima"),["n","Nama customer (opsional)","",null,"text"]],"Catat transaksi",e=>{
+  change(d=>L.exchange(d,{type,amount:val(e,"qty"),paid:val(e,"cash"),profit:0,name:e.n.value.trim()}));notice("Transaksi LKR tersimpan.")
  });
- if(weBuy)return;
- const p=E("p");p.className="inline-help";$("modalBody").prepend(p);
- const hint=()=>{let x=0;try{x=val(els,"qty")}catch{}p.textContent=quote?"Kurs acuan: "+L.rate(quote)+"/LKR"+(x?" · estimasi "+L.idr(Math.round(x*quote)):""):"Kurs acuan belum diisi. Kau tetap bisa mencatat jumlah IDR aktual.";};
- els.qty.oninput=hint;hint();
  };
 }
 $("refreshRate").onclick=()=>{
