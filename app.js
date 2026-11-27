@@ -49,7 +49,7 @@ function render(){
  const basis=capital.lkrCents>0n?Number(capital.idr)*100/Number(capital.lkrCents):null,buy=buyQuote(capital);
  $("rateSource").textContent=auto?"KURS OTOMATIS":"KURS GOOGLE";$("fxCredit").classList.toggle("hidden",!auto);
  const stamp=m?new Date(auto?fx.at:s.google_set_at).toLocaleString("id-ID",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";
- const vals={baseBal:L.idr(b.base_amount),cashIdr:L.idr(b.cash_idr),tradeBal:L.fmt(b.trade_amount)+" LKR",lkrHand:L.fmt(b.lkr_in_hand)+" LKR",profit:L.idr(b.profit_month_idr),basis:basis===null?"—":L.rate(basis),buyRate:buy?L.rate(buy):"—",sellRate:sellQuote()?L.rate(sellQuote()):"—",marketRate:m?"Rp "+L.fmt(m,6):"—",rateMsg:auto?(fxLoading?"Memuat…":m?stamp:"Data belum tersedia"):(m?"Manual · "+stamp:"Pilih sumber kurs")};
+ const vals={baseBal:L.idr(b.base_amount),cashIdr:L.idr(b.cash_idr),tradeBal:L.fmt(b.trade_amount)+" LKR",lkrHand:L.fmt(b.lkr_in_hand)+" LKR",basis:basis===null?"—":L.rate(basis),buyRate:buy?L.rate(buy):"—",sellRate:sellQuote()?L.rate(sellQuote()):"—",marketRate:m?"Rp "+L.fmt(m,6):"—",rateMsg:auto?(fxLoading?"Memuat…":m?stamp:"Data belum tersedia"):(m?"Manual · "+stamp:"Pilih sumber kurs")};
  for(const [k,v] of Object.entries(vals))$(k).textContent=v;
 }
 function modal(title,help,fields,action,cb){
@@ -109,6 +109,10 @@ $("settingsBtn").onclick=()=>{
   const mode=E("button","Kurs Google manual");mode.type="button";mode.style.marginTop="12px";
   mode.onclick=showGoogleRate;$("modalBody").append(mode);
  }
+ const actions=E("div");actions.className="actions";actions.style.marginTop="12px";
+ const exp=E("button","Unduh cadangan"),imp=E("button","Impor cadangan LKR");
+ exp.type=imp.type="button";exp.onclick=download;imp.onclick=()=>$("importFile").click();
+ actions.append(exp,imp);$("modalBody").append(actions);
 };
 const showHistory=(title,customer)=>{
  const box=modal(title,"");
@@ -123,12 +127,6 @@ const showHistory=(title,customer)=>{
 };
 $("customerHistoryBtn").onclick=()=>showHistory("Riwayat Transaksi Customer",true);
 $("capitalHistoryBtn").onclick=()=>showHistory("Riwayat Tambah Modal",false);
-$("profitHistoryBtn").onclick=()=>{
- const box=modal("Profit Bulanan","Tutup bulan menyimpan profit dan mengosongkan profit bulan ini. Saldo dan transaksi tidak diubah.");
- for(const t of [...state.profitHistory].sort((a,b)=>b.period_start.localeCompare(a.period_start)))box.append(E("p",t.period_start.slice(0,7)+" · "+L.idr(t.profit_idr)));
- const b=E("button","Tutup profit bulan ini");box.append(b);
- b.onclick=()=>{if(!confirm("Simpan profit bulan ini dan set profit berjalan ke nol?"))return;try{change(d=>L.closeProfit(d));close();notice("Profit bulan ini sudah ditutup.")}catch(e){$("modalMsg").textContent=e.message}};
-};
 function quote(isBuy){
  const rate=isBuy?buyQuote():sellQuote(),s=state.settings;
  if(!rate){notice(isBuy?"Kurs dasar modal belum tersedia.":"Isi kurs dulu sebelum membagikan.");return}
@@ -141,8 +139,7 @@ $("shareBuyBtn").onclick=()=>quote(true);$("shareSellBtn").onclick=()=>quote(fal
 function download(){
  const url=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:"application/json"}));const a=E("a");a.href=url;a.download="money-changer-lkr-"+new Date().toISOString().slice(0,10)+".json";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
 }
-$("exportBtn").onclick=download;
-$("importBtn").onclick=$("welcomeImport").onclick=()=>$("importFile").click();
+$("welcomeImport").onclick=()=>$("importFile").click();
 $("importFile").onchange=async e=>{
  const f=e.target.files[0];e.target.value="";if(!f)return;
  try{
