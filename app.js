@@ -112,9 +112,8 @@ for(const [id,type,title] of [["buyBtn","CUSTOMER_BUY","Customer beli LKR"],["se
  const clearDerived=name=>{if(derived===name)setAmount(name,"")};
  els.cash.addEventListener("input",()=>{
   if(derived==="cash")derived=null;
-  if(weBuy)return;
   let idr=0;try{idr=val(els,"cash")}catch{}
-  const rate=buyQuote();
+  const rate=BigInt(weBuy?sellQuote():buyQuote());
   if(!rate||idr<=0||!Number.isInteger(idr)){clearDerived("qty");return}
   const cents=(BigInt(idr)*100n+rate/2n)/rate;
   const decimals=String(cents%100n).padStart(2,"0").replace(/0+$/,"");
