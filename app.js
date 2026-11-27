@@ -6,7 +6,7 @@ const autoKey="money-changer-lkr-auto-source-v1";
 let auto=false,fx=null,fxLoading=false,tappedAt=0;
 try{auto=localStorage.getItem(autoKey)==="exchangerate.dev"}catch{}
 const reference=()=>auto?(FX.eligible(fx)?fx.rate:0):L.google(state);
-const buyQuote=()=>L.buy(state,reference()),sellQuote=()=>Math.floor(reference()*985/1000);
+const sellQuote=()=>Math.floor(reference()*985/1000);
 async function refreshAuto(force=false){
  if(!state||!auto||fxLoading||(!force&&Date.now()-tappedAt<120000))return;
  tappedAt=Date.now();fxLoading=true;render();
@@ -32,19 +32,24 @@ function save(candidate){
  localStorage.setItem(key,next);raw=next;state=safe;active();render()
 }
 const change=fn=>{const d=JSON.parse(raw);fn(d);save(d)};
-function cardCapitalRate(transactions){
- let idr=0,lkr=0;
+function cardCapitalTotals(transactions){
+ let idr=0n,lkrCents=0n;
  for(const t of transactions){
   if(t.transaction_type!=="ADD_CAPITAL"&&t.transaction_type!=="CUSTOMER_SELL")continue;
-  idr+=t.base_amount;lkr+=t.trade_amount;
+  idr+=BigInt(t.base_amount);lkrCents+=BigInt(Math.round(t.trade_amount*100));
  }
- return lkr>0?idr/lkr:null;
+ return {idr,lkrCents};
+}
+function buyQuote({idr,lkrCents}=cardCapitalTotals(state.transactions)){
+ // IDR/LKR × 1.01, rounded up exactly using LKR hundredths.
+ return lkrCents>0n?(idr*101n+lkrCents-1n)/lkrCents:0n;
 }
 function render(){
- const b=state.balance,s=state.settings,m=reference(),basis=cardCapitalRate(state.transactions);
+ const b=state.balance,s=state.settings,m=reference(),capital=cardCapitalTotals(state.transactions);
+ const basis=capital.lkrCents>0n?Number(capital.idr)*100/Number(capital.lkrCents):null,buy=buyQuote(capital);
  $("rateSource").textContent=auto?"KURS OTOMATIS":"KURS GOOGLE";$("fxCredit").classList.toggle("hidden",!auto);
  const stamp=m?new Date(auto?fx.at:s.google_set_at).toLocaleString("id-ID",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";
- const vals={baseBal:L.idr(b.base_amount),cashIdr:L.idr(b.cash_idr),tradeBal:L.fmt(b.trade_amount)+" LKR",lkrHand:L.fmt(b.lkr_in_hand)+" LKR",profit:L.idr(b.profit_month_idr),basis:basis===null?"—":L.rate(basis),buyRate:buyQuote()?L.rate(buyQuote()):"—",sellRate:sellQuote()?L.rate(sellQuote()):"—",marketRate:m?"Rp "+L.fmt(m,6):"—",rateMsg:auto?(fxLoading?"Memuat…":m?stamp:"Data belum tersedia"):(m?"Manual · "+stamp:"Pilih sumber kurs")};
+ const vals={baseBal:L.idr(b.base_amount),cashIdr:L.idr(b.cash_idr),tradeBal:L.fmt(b.trade_amount)+" LKR",lkrHand:L.fmt(b.lkr_in_hand)+" LKR",profit:L.idr(b.profit_month_idr),basis:basis===null?"—":L.rate(basis),buyRate:buy?L.rate(buy):"—",sellRate:sellQuote()?L.rate(sellQuote()):"—",marketRate:m?"Rp "+L.fmt(m,6):"—",rateMsg:auto?(fxLoading?"Memuat…":m?stamp:"Data belum tersedia"):(m?"Manual · "+stamp:"Pilih sumber kurs")};
  for(const [k,v] of Object.entries(vals))$(k).textContent=v;
 }
 function modal(title,help,fields,action,cb){
@@ -97,8 +102,8 @@ function showGoogleRate(){
 };
 $("settingsBtn").onclick=()=>{
  const s=state.settings;
- modal("Pengaturan","Kurs jual berlaku saat customer menjual LKR. Harga dibulatkan ke bawah ke rupiah utuh.",[field("bm","Margin beli (%)",100*s.buy_margin),field("u","Pembulatan kurs beli (IDR)",s.rounding_unit),["bank","Nama bank",s.bank_name,null,"text"],["acc","Nomor rekening",s.bank_account_number,null,"text"],["holder","Atas nama",s.bank_account_name,null,"text"]],"Simpan",e=>{
- change(d=>Object.assign(d.settings,{buy_margin:val(e,"bm")/100,rounding_unit:val(e,"u"),bank_name:e.bank.value.trim(),bank_account_number:e.acc.value.trim(),bank_account_name:e.holder.value.trim()}));notice("Pengaturan tersimpan.");
+ modal("Pengaturan","Kurs jual berlaku saat customer menjual LKR. Harga dibulatkan ke bawah ke rupiah utuh.",[["bank","Nama bank",s.bank_name,null,"text"],["acc","Nomor rekening",s.bank_account_number,null,"text"],["holder","Atas nama",s.bank_account_name,null,"text"]],"Simpan",e=>{
+ change(d=>Object.assign(d.settings,{bank_name:e.bank.value.trim(),bank_account_number:e.acc.value.trim(),bank_account_name:e.holder.value.trim()}));notice("Pengaturan tersimpan.");
  });
  if(auto){
   const mode=E("button","Kurs Google manual");mode.type="button";mode.style.marginTop="12px";
@@ -126,7 +131,7 @@ $("profitHistoryBtn").onclick=()=>{
 };
 function quote(isBuy){
  const rate=isBuy?buyQuote():sellQuote(),s=state.settings;
- if(!rate){notice("Isi kurs dulu sebelum membagikan.");return}
+ if(!rate){notice(isBuy?"Kurs dasar modal belum tersedia.":"Isi kurs dulu sebelum membagikan.");return}
  const text=(isBuy?"KURS BELI LKR":"KURS JUAL LKR")+"\n1 LKR = "+L.rate(rate)+(isBuy&&s.bank_account_number?"\n\n"+s.bank_name+"\n"+s.bank_account_number+"\n"+s.bank_account_name:"");
  if(navigator.share){navigator.share({title:"Money Changer",text}).catch(e=>{if(e.name!=="AbortError")previewQuote(text)});return}
  previewQuote(text)
