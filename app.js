@@ -117,7 +117,7 @@ $("settingsBtn").onclick=()=>{
 const showHistory=(title,customer)=>{
  const box=modal(title,"");
  const list=state.transactions.filter(t=>t.transaction_type.startsWith("CUSTOMER_")===customer).sort((a,b)=>Date.parse(b.created_at)-Date.parse(a.created_at));
- const visible=customer?list.slice(0,10):list;
+ const visible=list.slice(0,customer?10:5);
  if(!visible.length)box.append(E("p","Belum ada transaksi."));
  for(const t of visible){
   const item=E("div");item.className="history-item entry";
