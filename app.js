@@ -118,9 +118,23 @@ $("settingsBtn").onclick=()=>{
  const buy=percentage(e.bp,10000,"Persentase Kurs Beli"),sell=percentage(e.sp,9999,"Persentase Kurs Jual");
  change(d=>Object.assign(d.settings,{buy_markup_bps:buy,sell_discount_bps:sell,bank_name:e.bank.value.trim(),bank_account_number:e.acc.value.trim(),bank_account_name:e.holder.value.trim()}));notice("Pengaturan tersimpan.");
  });
+ const update=E("button","Atur IDR di Tangan");update.type="button";update.style.marginTop="12px";
+ update.onclick=adjustCash;$("modalBody").append(update);
  const reset=E("button","Reset Data");reset.type="button";reset.className="danger";reset.style.marginTop="12px";
  reset.onclick=()=>resetData();$("modalBody").append(reset);
 };
+function adjustCash(){
+ modal("Atur IDR di Tangan","Saldo sekarang: "+L.idr(state.balance.cash_idr)+". Isi salah satu kolom. IDR aktual mengganti saldo, sedangkan Tambah IDR menambah saldo.",[field("actual","IDR aktual (Rp)"),field("add","Tambah IDR (Rp)")],"Simpan saldo",e=>{
+  const actual=e.actual.value.trim()!=="",add=e.add.value.trim()!=="";
+  if(actual===add)throw Error("Isi salah satu kolom saja.");
+  const amount=val(e,actual?"actual":"add");
+  if(!Number.isInteger(amount)||(add&&amount<=0))throw Error("Masukkan rupiah bulat. Tambah IDR harus lebih dari nol.");
+  change(d=>{d.balance.cash_idr=actual?amount:d.balance.cash_idr+amount});
+  notice("Saldo IDR di Tangan diperbarui.");
+ });
+ const back=E("button","Kembali");back.type="button";back.style.marginTop="12px";
+ back.onclick=$("settingsBtn").onclick;$("modalBody").append(back);
+}
 function resetData(){
  modal("Reset Data","Ini menghapus saldo, transaksi, dan riwayat profit di browser ini. Pengaturan kurs dan rekening tetap. Tindakan ini tidak bisa dibatalkan.",[["confirm","Ketik RESET untuk mengonfirmasi","",null,"text"]],"Hapus data",e=>{
   if(e.confirm.value.trim()!=="RESET")throw Error("Ketik RESET untuk melanjutkan.");
