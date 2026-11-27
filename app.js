@@ -6,7 +6,7 @@ const autoKey="money-changer-lkr-auto-source-v1";
 let auto=false,fx=null,fxLoading=false,tappedAt=0;
 try{auto=localStorage.getItem(autoKey)==="exchangerate.dev"}catch{}
 const reference=()=>auto?(FX.eligible(fx)?fx.rate:0):L.google(state);
-const sellQuote=()=>Math.floor(reference()*985/1000);
+const sellQuote=()=>Math.floor(reference()*(10000-state.settings.sell_discount_bps)/10000);
 async function refreshAuto(force=false){
  if(!state||!auto||fxLoading||(!force&&Date.now()-tappedAt<120000))return;
  tappedAt=Date.now();fxLoading=true;render();
@@ -41,8 +41,9 @@ function cardCapitalTotals(transactions){
  return {idr,lkrCents};
 }
 function buyQuote({idr,lkrCents}=cardCapitalTotals(state.transactions)){
- // IDR/LKR × 1.01, rounded up exactly using LKR hundredths.
- return lkrCents>0n?(idr*101n+lkrCents-1n)/lkrCents:0n;
+ // Apply markup and ceil exactly, using LKR hundredths and percentage basis points.
+ const denominator=lkrCents*100n;
+ return denominator>0n?(idr*BigInt(10000+state.settings.buy_markup_bps)+denominator-1n)/denominator:0n;
 }
 function render(){
  const b=state.balance,s=state.settings,m=reference(),capital=cardCapitalTotals(state.transactions);
@@ -64,7 +65,7 @@ function modal(title,help,fields,action,cb){
   i.value=value??"";wrap.append(l,i);form.append(wrap);els[name]=i;
  }
  const b=E("button",action);b.className="primary";form.append(b);box.append(form);
- form.onsubmit=e=>{e.preventDefault();try{cb(els);close()}catch(err){const out=$("modalMsg");out.className="status err";out.textContent=err.name==="QuotaExceededError"?"Penyimpanan browser penuh. Unduh cadangan sebelum lanjut.":err.message}};
+ form.onsubmit=e=>{e.preventDefault();try{cb(els);close()}catch(err){const out=$("modalMsg");out.className="status err";out.textContent=err.name==="QuotaExceededError"?"Penyimpanan browser penuh. Perubahan tidak tersimpan.":err.message}};
  return els;
 }
 function close(){$("modal").classList.add("hidden")}
@@ -100,20 +101,31 @@ function showGoogleRate(){
  opt.onclick=()=>{try{chooseAuto(true)}catch(e){$("modalMsg").textContent=e.message}};
  box.append(opt,E("p","Jeda ±15 menit."));
 };
+function percentage(input,max,label){
+ const value=input.value.trim();
+ const match=/^(\d{1,3})(?:[.,](\d{1,2}))?$/.exec(value);
+ const points=match?Number(match[1])*100+Number((match[2]??"").padEnd(2,"0")):-1;
+ if(points<0||points>max)throw Error(label+" harus 0–"+L.fmt(max/100)+"%, maksimal dua desimal.");
+ return points;
+}
 $("settingsBtn").onclick=()=>{
  const s=state.settings;
- modal("Pengaturan","Kurs jual berlaku saat customer menjual LKR. Harga dibulatkan ke bawah ke rupiah utuh.",[["bank","Nama bank",s.bank_name,null,"text"],["acc","Nomor rekening",s.bank_account_number,null,"text"],["holder","Atas nama",s.bank_account_name,null,"text"]],"Simpan",e=>{
- change(d=>Object.assign(d.settings,{bank_name:e.bank.value.trim(),bank_account_number:e.acc.value.trim(),bank_account_name:e.holder.value.trim()}));notice("Pengaturan tersimpan.");
+ modal("Pengaturan","Kurs Beli ditambah dari Kurs Dasar Modal dan dibulatkan ke atas. Kurs Jual dipotong dari kurs acuan dan dibulatkan ke bawah.",[["bp","Persentase Kurs Beli (%)",L.fmt(s.buy_markup_bps/100)],["sp","Persentase Kurs Jual (%)",L.fmt(s.sell_discount_bps/100)],["bank","Nama bank",s.bank_name,null,"text"],["acc","Nomor rekening",s.bank_account_number,null,"text"],["holder","Atas nama",s.bank_account_name,null,"text"]],"Simpan",e=>{
+ const buy=percentage(e.bp,10000,"Persentase Kurs Beli"),sell=percentage(e.sp,9999,"Persentase Kurs Jual");
+ change(d=>Object.assign(d.settings,{buy_markup_bps:buy,sell_discount_bps:sell,bank_name:e.bank.value.trim(),bank_account_number:e.acc.value.trim(),bank_account_name:e.holder.value.trim()}));notice("Pengaturan tersimpan.");
  });
- if(auto){
-  const mode=E("button","Kurs Google manual");mode.type="button";mode.style.marginTop="12px";
-  mode.onclick=showGoogleRate;$("modalBody").append(mode);
- }
- const actions=E("div");actions.className="actions";actions.style.marginTop="12px";
- const exp=E("button","Unduh cadangan"),imp=E("button","Impor cadangan LKR");
- exp.type=imp.type="button";exp.onclick=download;imp.onclick=()=>$("importFile").click();
- actions.append(exp,imp);$("modalBody").append(actions);
+ const reset=E("button","Reset Data");reset.type="button";reset.className="danger";reset.style.marginTop="12px";
+ reset.onclick=()=>resetData();$("modalBody").append(reset);
 };
+function resetData(){
+ modal("Reset Data","Ini menghapus saldo, transaksi, dan riwayat profit di browser ini. Pengaturan kurs dan rekening tetap. Tindakan ini tidak bisa dibatalkan.",[["confirm","Ketik RESET untuk mengonfirmasi","",null,"text"]],"Hapus data",e=>{
+  if(e.confirm.value.trim()!=="RESET")throw Error("Ketik RESET untuk melanjutkan.");
+  change(d=>{d.balance=L.create().balance;d.transactions=[];d.profitHistory=[]});notice("Data transaksi dan saldo sudah direset.");
+ });
+ const box=$("modalBody");
+ const submit=box.querySelector("form button");submit.className="danger";
+ const cancel=E("button","Batal");cancel.type="button";cancel.style.marginTop="12px";cancel.onclick=$("settingsBtn").onclick;box.append(cancel);
+}
 const showHistory=(title,customer)=>{
  const box=modal(title,"");
  const list=state.transactions.filter(t=>t.transaction_type.startsWith("CUSTOMER_")===customer).sort((a,b)=>Date.parse(b.created_at)-Date.parse(a.created_at));
@@ -130,12 +142,22 @@ $("customerHistoryBtn").onclick=()=>showHistory("Riwayat Transaksi Customer",tru
 $("capitalHistoryBtn").onclick=()=>showHistory("Riwayat Tambah Modal",false);
 function quote(isBuy){
  const rate=isBuy?buyQuote():sellQuote(),s=state.settings;
- if(!rate){notice(isBuy?"Kurs dasar modal belum tersedia.":"Isi kurs dulu sebelum membagikan.");return}
+ if(!rate){
+  if(!isBuy){notice("Isi kurs dulu sebelum membagikan.");return}
+  const box=modal("Bagikan Kurs Beli","Kurs beli belum tersedia. Catat modal IDR dan LKR atau transaksi Customer Jual LKR untuk menghitung Kurs Dasar Modal.");
+  const b=E("button","Tambah Modal");b.type="button";b.onclick=$("capitalBtn").onclick;box.append(b);return;
+ }
  const text=(isBuy?"KURS BELI LKR":"KURS JUAL LKR")+"\n1 LKR = "+L.rate(rate)+(isBuy&&s.bank_account_number?"\n\n"+s.bank_name+"\n"+s.bank_account_number+"\n"+s.bank_account_name:"");
- if(navigator.share){navigator.share({title:"Money Changer",text}).catch(e=>{if(e.name!=="AbortError")previewQuote(text)});return}
- previewQuote(text)
+ if(typeof navigator.share==="function"){
+  try{Promise.resolve(navigator.share({title:"Money Changer",text})).catch(e=>{if(e?.name!=="AbortError")previewQuote(text)});return}catch(e){if(e?.name==="AbortError")return}
+ }
+ previewQuote(text);
 }
-function previewQuote(text){const b=modal("Salin kurs","");b.append(E("pre",text));const c=E("button","Salin");b.append(c);c.onclick=async()=>{try{await navigator.clipboard.writeText(text);$("modalMsg").textContent="Disalin."}catch{$("modalMsg").textContent="Pilih teks di atas dan salin secara manual."}}}
+function previewQuote(text){
+ const b=modal("Salin kurs",""),message=E("textarea"),c=E("button","Salin");
+ message.value=text;message.readOnly=true;message.rows=text.split("\n").length+1;message.className="quote-text";message.setAttribute("aria-label","Teks kurs untuk dibagikan");
+ b.append(message,c);c.onclick=async()=>{try{await navigator.clipboard.writeText(text);$("modalMsg").textContent="Disalin."}catch{message.focus();message.select();$("modalMsg").textContent="Salin teks yang dipilih."}};
+}
 $("shareBuyBtn").onclick=()=>quote(true);$("shareSellBtn").onclick=()=>quote(false);
 function download(){
  const url=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:"application/json"}));const a=E("a");a.href=url;a.download="money-changer-lkr-"+new Date().toISOString().slice(0,10)+".json";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);

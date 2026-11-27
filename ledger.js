@@ -1,7 +1,7 @@
 "use strict";
 const Ledger=(()=>{
 const zero=()=>({base_amount:0,cash_idr:0,trade_amount:0,lkr_in_hand:0,profit_month_idr:0});
-const create=()=>({format:"money-changer-lkr",version:1,settings:{buy_margin:0,sell_margin:0,rounding_unit:0.01,market:0,market_mode:"auto",google_rate:0,google_set_at:null,bank_name:"",bank_account_name:"",bank_account_number:""},balance:zero(),transactions:[],profitHistory:[]});
+const create=()=>({format:"money-changer-lkr",version:1,settings:{buy_markup_bps:100,sell_discount_bps:150,buy_margin:0,sell_margin:0,rounding_unit:0.01,market:0,market_mode:"auto",google_rate:0,google_set_at:null,bank_name:"",bank_account_name:"",bank_account_number:""},balance:zero(),transactions:[],profitHistory:[]});
 const number=(x,min=0,max=1e12)=>typeof x==="number"&&Number.isFinite(x)&&x>=min&&x<=max;
 const ok=(v,msg)=>{if(!v)throw Error(msg)};
 const str=(x,n=140)=>typeof x==="string"&&x.length<=n;
@@ -18,11 +18,12 @@ const parse=(val,negative=false)=>{
  ok(number(x,negative?-1e12:0),"Angka di luar batas.");
  return x;
 };
+const margin=(x,max)=>Number.isInteger(x)&&number(x,0,max);
 const validate=d=>{
  ok(d&&d.format==="money-changer-lkr"&&d.version===1,"Pilih cadangan JSON dari Money Changer LKR. Buku lain tidak dapat diimpor.");
  const b=d.balance,s=d.settings;
  ok(b&&Object.keys(zero()).every(k=>number(b[k],k==="profit_month_idr"?-1e12:0)),"Saldo cadangan tidak valid.");
- ok(s&&number(s.buy_margin,0,1)&&number(s.sell_margin,0,.99)&&number(s.rounding_unit,.01,1e6)&&money(s.rounding_unit,2)===s.rounding_unit&&number(s.market)&&["auto","manual","google"].includes(s.market_mode??"auto")&&number(s.google_rate??0,0,1e6)&&(s.google_set_at==null||validDate(s.google_set_at))&&["bank_name","bank_account_name","bank_account_number"].every(k=>str(s[k])),"Pengaturan cadangan tidak valid.");
+ ok(s&&margin(s.buy_markup_bps??100,10000)&&margin(s.sell_discount_bps??150,9999)&&number(s.buy_margin,0,1)&&number(s.sell_margin,0,.99)&&number(s.rounding_unit,.01,1e6)&&money(s.rounding_unit,2)===s.rounding_unit&&number(s.market)&&["auto","manual","google"].includes(s.market_mode??"auto")&&number(s.google_rate??0,0,1e6)&&(s.google_set_at==null||validDate(s.google_set_at))&&["bank_name","bank_account_name","bank_account_number"].every(k=>str(s[k])),"Pengaturan cadangan tidak valid.");
  ok(Array.isArray(d.transactions)&&d.transactions.length<=25000&&d.transactions.every(t=>t&&types.includes(t.transaction_type)&&validDate(t.created_at)&&number(t.trade_amount)&&money(t.trade_amount,2)===t.trade_amount&&number(t.base_amount)&&Number.isInteger(t.base_amount)&&number(t.customer_rate??0)&&number(t.profit_idr??0,-1e12)&&str(t.customer_name??"")),"Riwayat transaksi tidak valid.");
  ok(Array.isArray(d.profitHistory)&&d.profitHistory.length<=1000&&d.profitHistory.every(t=>t&&str(t.period_start,10)&&/^\d{4}-\d{2}-\d{2}$/.test(t.period_start)&&validDate(t.period_start)&&validDate(t.closed_at)&&number(t.profit_idr,-1e12)),"Riwayat profit tidak valid.");
  // Whitelist fields so no authorization or database credentials enter the local backup.
