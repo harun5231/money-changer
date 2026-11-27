@@ -57,6 +57,25 @@ function render(){
  const vals={baseBal:L.idr(modalIdr),tradeBal:L.fmt(b.trade_amount)+" LKR",lkrHand:L.fmt(b.lkr_in_hand)+" LKR",idrHand:L.idr(b.cash_idr),basis:basis===null?"—":L.rate(basis),buyRate:buy?L.rate(buy):"—",sellRate:sellQuote()?L.rate(sellQuote()):"—",marketRate:m?"Rp "+L.fmt(m,6):"—",rateMsg:auto?(fxLoading?"Memuat…":m?stamp:"Data belum tersedia"):(m?"Manual · "+stamp:"Pilih sumber kurs")};
  for(const [k,v] of Object.entries(vals))$(k).textContent=v;
 }
+function groupAmount(input,event){
+ const raw=input.value, pos=input.selectionStart;
+ if(event?.inputType==="insertFromPaste"&&raw.includes(".")&&!/^\d{1,3}(?:\.\d{3})+(?:,\d*)?$/.test(raw))return;
+ if(!/^[\d.]*(?:,\d*)?$/.test(raw))return;
+ let plain=raw.replaceAll(".","");
+ let left=pos===null?null:raw.slice(0,pos).replaceAll(".","").length;
+ // If backspace removed only a separator, remove the digit just before it.
+ if(event?.inputType==="deleteContentBackward"&&plain===input.dataset.plainAmount&&left>0){
+  plain=plain.slice(0,left-1)+plain.slice(left);left--;
+ }
+ const grouped=plain.replace(/^\d+/,digits=>digits.replace(/\B(?=(\d{3})+(?!\d))/g,"."));
+ input.dataset.plainAmount=plain;
+ if(grouped===raw)return;
+ input.value=grouped;
+ if(left===null)return;
+ let i=0,n=0;
+ for(;i<grouped.length&&n<left;i++)if(grouped[i]!==".")n++;
+ input.setSelectionRange(i,i);
+}
 function modal(title,help,fields,action,cb){
  const box=$("modalBody");box.replaceChildren();$("modalTitle").textContent=title;$("modalMsg").textContent="";$("modalMsg").className="status";$("modal").classList.remove("hidden");
  if(help){const p=E("p",help);p.className="inline-help";box.append(p)}
@@ -66,7 +85,8 @@ function modal(title,help,fields,action,cb){
   const [name,label,value,opts,kind]=f, wrap=E("div"), l=E("label",label), i=E(opts?"select":"input");wrap.className="field";l.htmlFor=i.id="f_"+name;
   if(opts){for(const o of opts){const e=E("option",o);e.value=o;i.append(e)}}
   else {i.inputMode=kind==="text"?"text":"decimal";i.autocomplete="off";i.maxLength=140}
-  i.value=value??"";wrap.append(l,i);form.append(wrap);els[name]=i;
+  i.value=value??"";if(kind==="amount"){i.dataset.plainAmount=i.value.replaceAll(".","");i.oninput=e=>groupAmount(i,e)}
+  wrap.append(l,i);form.append(wrap);els[name]=i;
  }
  const b=E("button",action);b.className="primary";form.append(b);box.append(form);
  form.onsubmit=e=>{e.preventDefault();try{cb(els);close()}catch(err){const out=$("modalMsg");out.className="status err";out.textContent=err.name==="QuotaExceededError"?"Penyimpanan browser penuh. Perubahan tidak tersimpan.":err.message}};
@@ -74,15 +94,28 @@ function modal(title,help,fields,action,cb){
 }
 function close(){$("modal").classList.add("hidden")}
 $("close").onclick=close;
-const field=(name,label,n)=>[name,label,n==null||n===0?"":L.fmt(n,6)];
+const field=(name,label,n)=>[name,label,n==null||n===0?"":L.fmt(n,6),null,name==="rate"?null:"amount"];
 const val=(els,k,negative=false)=>L.parse(els[k].value,negative);
 $("fresh").onclick=()=>{try{save(L.create());notice("Buku LKR baru dibuat. Masukkan modal untuk mulai.");refreshAuto()}catch(e){notice(e.message)}};
 $("capitalBtn").onclick=()=>modal("Tambah Modal","Masukkan jumlah yang benar-benar kau tambahkan ke kas atau stok.",[field("a","Modal IDR"),field("u","Modal LKR")],"Simpan",e=>{change(d=>L.capital(d,val(e,"a"),val(e,"u")));notice("Modal tersimpan.")});
 for(const [id,type,title] of [["buyBtn","CUSTOMER_BUY","Customer beli LKR"],["sellBtn","CUSTOMER_SELL","Customer jual LKR"]]){
  $(id).onclick=()=>{
  const weBuy=type==="CUSTOMER_SELL";
- modal(title,null,[field("qty","Jumlah LKR"),field("cash",weBuy?"IDR dibayar":"IDR diterima"),["n","Nama customer (opsional)","",null,"text"]],"Catat transaksi",e=>{
+ const els=modal(title,null,[field("qty","Jumlah LKR"),field("cash",weBuy?"IDR dibayar":"IDR diterima"),["n","Nama customer (opsional)","",null,"text"]],"Catat transaksi",e=>{
   change(d=>L.exchange(d,{type,amount:val(e,"qty"),paid:val(e,"cash"),profit:0,name:e.n.value.trim()}));notice("Transaksi LKR tersimpan.")
+ });
+ let generated=null;
+ els.cash.addEventListener("input",()=>{generated=null});
+ els.qty.addEventListener("input",()=>{
+  let amount=0;try{amount=val(els,"qty")}catch{}
+  const rate=weBuy?sellQuote():buyQuote();
+  if(!rate||amount<=0||Number(amount.toFixed(2))!==amount){
+   if(generated!==null){els.cash.value="";els.cash.dataset.plainAmount="";generated=null}
+   return;
+  }
+  const total=(BigInt(Math.round(amount*100))*BigInt(rate)+50n)/100n;
+  generated=L.fmt(total,0);
+  els.cash.value=generated;els.cash.dataset.plainAmount=generated.replaceAll(".","");
  });
  };
 }
