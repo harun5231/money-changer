@@ -92,7 +92,7 @@ function showGoogleRate(){
 };
 $("settingsBtn").onclick=()=>{
  const s=state.settings;
- modal("Pengaturan","Kurs jual berlaku saat customer menjual LKR ke kau. Harga dibulatkan ke bawah ke rupiah utuh.",[field("bm","Margin beli (%)",100*s.buy_margin),field("u","Pembulatan kurs beli (IDR)",s.rounding_unit),["bank","Nama bank",s.bank_name,null,"text"],["acc","Nomor rekening",s.bank_account_number,null,"text"],["holder","Atas nama",s.bank_account_name,null,"text"]],"Simpan",e=>{
+ modal("Pengaturan","Kurs jual berlaku saat customer menjual LKR. Harga dibulatkan ke bawah ke rupiah utuh.",[field("bm","Margin beli (%)",100*s.buy_margin),field("u","Pembulatan kurs beli (IDR)",s.rounding_unit),["bank","Nama bank",s.bank_name,null,"text"],["acc","Nomor rekening",s.bank_account_number,null,"text"],["holder","Atas nama",s.bank_account_name,null,"text"]],"Simpan",e=>{
  change(d=>Object.assign(d.settings,{buy_margin:val(e,"bm")/100,rounding_unit:val(e,"u"),bank_name:e.bank.value.trim(),bank_account_number:e.acc.value.trim(),bank_account_name:e.holder.value.trim()}));notice("Pengaturan tersimpan.");
  });
  if(auto){
