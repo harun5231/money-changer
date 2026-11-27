@@ -32,11 +32,19 @@ function save(candidate){
  localStorage.setItem(key,next);raw=next;state=safe;active();render()
 }
 const change=fn=>{const d=JSON.parse(raw);fn(d);save(d)};
+function cardCapitalRate(transactions){
+ let idr=0,lkr=0;
+ for(const t of transactions){
+  if(t.transaction_type!=="ADD_CAPITAL"&&t.transaction_type!=="CUSTOMER_SELL")continue;
+  idr+=t.base_amount;lkr+=t.trade_amount;
+ }
+ return lkr>0?idr/lkr:null;
+}
 function render(){
- const b=state.balance,s=state.settings,m=reference();
+ const b=state.balance,s=state.settings,m=reference(),basis=cardCapitalRate(state.transactions);
  $("rateSource").textContent=auto?"KURS OTOMATIS":"KURS GOOGLE";$("fxCredit").classList.toggle("hidden",!auto);
  const stamp=m?new Date(auto?fx.at:s.google_set_at).toLocaleString("id-ID",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";
- const vals={baseBal:L.idr(b.base_amount),cashIdr:L.idr(b.cash_idr),tradeBal:L.fmt(b.trade_amount)+" LKR",lkrHand:L.fmt(b.lkr_in_hand)+" LKR",profit:L.idr(b.profit_month_idr),basis:L.basis(state)?L.rate(L.basis(state)):"—",buyRate:buyQuote()?L.rate(buyQuote()):"—",sellRate:sellQuote()?L.rate(sellQuote()):"—",marketRate:m?"Rp "+L.fmt(m,6):"—",rateMsg:auto?(fxLoading?"Memuat…":m?stamp:"Data belum tersedia"):(m?"Manual · "+stamp:"Pilih sumber kurs")};
+ const vals={baseBal:L.idr(b.base_amount),cashIdr:L.idr(b.cash_idr),tradeBal:L.fmt(b.trade_amount)+" LKR",lkrHand:L.fmt(b.lkr_in_hand)+" LKR",profit:L.idr(b.profit_month_idr),basis:basis===null?"—":L.rate(basis),buyRate:buyQuote()?L.rate(buyQuote()):"—",sellRate:sellQuote()?L.rate(sellQuote()):"—",marketRate:m?"Rp "+L.fmt(m,6):"—",rateMsg:auto?(fxLoading?"Memuat…":m?stamp:"Data belum tersedia"):(m?"Manual · "+stamp:"Pilih sumber kurs")};
  for(const [k,v] of Object.entries(vals))$(k).textContent=v;
 }
 function modal(title,help,fields,action,cb){
@@ -63,9 +71,10 @@ $("capitalBtn").onclick=()=>modal("Tambah Modal","Masukkan jumlah yang benar-ben
 for(const [id,type,title] of [["buyBtn","CUSTOMER_BUY","Customer beli LKR"],["sellBtn","CUSTOMER_SELL","Customer jual LKR"]]){
  $(id).onclick=()=>{
  const weBuy=type==="CUSTOMER_SELL", quote=weBuy?sellQuote():buyQuote();
- const els=modal(title,"Isi IDR yang benar-benar "+(weBuy?"kau bayarkan.":"kau terima.")+" Profit diisi manual (kosong berarti nol).",[field("qty","Jumlah LKR"),field("cash",weBuy?"IDR dibayar":"IDR diterima"),field("p","Profit IDR (opsional, boleh negatif)"),["n","Nama customer (opsional)","",null,"text"]],"Catat transaksi",e=>{
-  change(d=>L.exchange(d,{type,amount:val(e,"qty"),paid:val(e,"cash"),profit:val(e,"p",true),name:e.n.value.trim()}));notice("Transaksi LKR tersimpan.")
+ const els=modal(title,weBuy?null:"Isi IDR yang benar-benar kau terima. Profit diisi manual (kosong berarti nol).",[field("qty","Jumlah LKR"),field("cash",weBuy?"IDR dibayar":"IDR diterima"),...(weBuy?[]:[field("p","Profit IDR (opsional, boleh negatif)")]),["n","Nama customer (opsional)","",null,"text"]],"Catat transaksi",e=>{
+  change(d=>L.exchange(d,{type,amount:val(e,"qty"),paid:val(e,"cash"),profit:weBuy?0:val(e,"p",true),name:e.n.value.trim()}));notice("Transaksi LKR tersimpan.")
  });
+ if(weBuy)return;
  const p=E("p");p.className="inline-help";$("modalBody").prepend(p);
  const hint=()=>{let x=0;try{x=val(els,"qty")}catch{}p.textContent=quote?"Kurs acuan: "+L.rate(quote)+"/LKR"+(x?" · estimasi "+L.idr(Math.round(x*quote)):""):"Kurs acuan belum diisi. Kau tetap bisa mencatat jumlah IDR aktual.";};
  els.qty.oninput=hint;hint();
