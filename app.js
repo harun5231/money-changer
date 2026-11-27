@@ -117,8 +117,9 @@ $("settingsBtn").onclick=()=>{
 const showHistory=(title,customer)=>{
  const box=modal(title,"");
  const list=state.transactions.filter(t=>t.transaction_type.startsWith("CUSTOMER_")===customer).sort((a,b)=>Date.parse(b.created_at)-Date.parse(a.created_at));
- if(!list.length)box.append(E("p","Belum ada transaksi."));
- for(const t of list){
+ const visible=customer?list.slice(0,10):list;
+ if(!visible.length)box.append(E("p","Belum ada transaksi."));
+ for(const t of visible){
   const item=E("div");item.className="history-item entry";
   const label={INITIAL_CAPITAL:"Modal awal",ADD_CAPITAL:"Tambah modal",CUSTOMER_BUY:"Customer beli LKR",CUSTOMER_SELL:"Customer jual LKR"}[t.transaction_type];
   item.append(E("strong",label+(t.customer_name?" · "+t.customer_name:"")),E("p",L.idr(t.base_amount)+" · "+L.fmt(t.trade_amount,6)+" LKR"),E("small",new Date(t.created_at).toLocaleString("id-ID")+(t.customer_rate?" · "+L.rate(t.customer_rate)+"/LKR":"")));
