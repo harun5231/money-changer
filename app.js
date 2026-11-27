@@ -33,12 +33,14 @@ function save(candidate){
 }
 const change=fn=>{const d=JSON.parse(raw);fn(d);save(d)};
 function cardCapitalTotals(transactions){
- let idr=0n,lkrCents=0n;
+ let idr=0n,lkrCents=0n,customerSellIdr=0n;
  for(const t of transactions){
   if(t.transaction_type!=="ADD_CAPITAL"&&t.transaction_type!=="CUSTOMER_SELL")continue;
-  idr+=BigInt(t.base_amount);lkrCents+=BigInt(Math.round(t.trade_amount*100));
+  const amount=BigInt(t.base_amount);
+  idr+=amount;lkrCents+=BigInt(Math.round(t.trade_amount*100));
+  if(t.transaction_type==="CUSTOMER_SELL")customerSellIdr+=amount;
  }
- return {idr,lkrCents};
+ return {idr,lkrCents,customerSellIdr};
 }
 function buyQuote({idr,lkrCents}=cardCapitalTotals(state.transactions)){
  // Apply markup and ceil exactly, using LKR hundredths and percentage basis points.
@@ -50,7 +52,9 @@ function render(){
  const basis=capital.lkrCents>0n?Number(capital.idr)*100/Number(capital.lkrCents):null,buy=buyQuote(capital);
  $("rateSource").textContent=auto?"KURS OTOMATIS":"KURS GOOGLE";$("fxCredit").classList.toggle("hidden",!auto);
  const stamp=m?new Date(auto?fx.at:s.google_set_at).toLocaleString("id-ID",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";
- const vals={baseBal:L.idr(b.base_amount),cashIdr:L.idr(b.cash_idr),tradeBal:L.fmt(b.trade_amount)+" LKR",lkrHand:L.fmt(b.lkr_in_hand)+" LKR",basis:basis===null?"—":L.rate(basis),buyRate:buy?L.rate(buy):"—",sellRate:sellQuote()?L.rate(sellQuote()):"—",marketRate:m?"Rp "+L.fmt(m,6):"—",rateMsg:auto?(fxLoading?"Memuat…":m?stamp:"Data belum tersedia"):(m?"Manual · "+stamp:"Pilih sumber kurs")};
+ // Modal IDR shows customer sales at 101% of actual paid IDR; cash and cost basis stay actual.
+ const modalIdr=BigInt(Math.round(b.base_amount))+(capital.customerSellIdr*101n+50n)/100n;
+ const vals={baseBal:L.idr(modalIdr),cashIdr:L.idr(b.cash_idr),tradeBal:L.fmt(b.trade_amount)+" LKR",lkrHand:L.fmt(b.lkr_in_hand)+" LKR",basis:basis===null?"—":L.rate(basis),buyRate:buy?L.rate(buy):"—",sellRate:sellQuote()?L.rate(sellQuote()):"—",marketRate:m?"Rp "+L.fmt(m,6):"—",rateMsg:auto?(fxLoading?"Memuat…":m?stamp:"Data belum tersedia"):(m?"Manual · "+stamp:"Pilih sumber kurs")};
  for(const [k,v] of Object.entries(vals))$(k).textContent=v;
 }
 function modal(title,help,fields,action,cb){
