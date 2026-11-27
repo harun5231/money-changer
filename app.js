@@ -32,29 +32,29 @@ function save(candidate){
  localStorage.setItem(key,next);raw=next;state=safe;active();render()
 }
 const change=fn=>{const d=JSON.parse(raw);fn(d);save(d)};
-function cardCapitalTotals(transactions){
- let idr=0n,lkrCents=0n,customerSellIdr=0n;
+function cardCapitalTotals({transactions,balance}){
+ let lkrCents=0n,customerSellIdr=0n;
  for(const t of transactions){
   if(t.transaction_type!=="ADD_CAPITAL"&&t.transaction_type!=="CUSTOMER_SELL")continue;
   const amount=BigInt(t.base_amount);
-  idr+=amount;lkrCents+=BigInt(Math.round(t.trade_amount*100));
+  lkrCents+=BigInt(Math.round(t.trade_amount*100));
   if(t.transaction_type==="CUSTOMER_SELL")customerSellIdr+=amount;
  }
- return {idr,lkrCents,customerSellIdr};
+ // The rate uses the exact whole-IDR amount shown on the Modal IDR card.
+ const idr=BigInt(Math.round(balance.base_amount))+(customerSellIdr*101n+50n)/100n;
+ return {idr,lkrCents};
 }
-function buyQuote({idr,lkrCents}=cardCapitalTotals(state.transactions)){
+function buyQuote({idr,lkrCents}=cardCapitalTotals(state)){
  // Apply markup and ceil exactly, using LKR hundredths and percentage basis points.
  const denominator=lkrCents*100n;
  return denominator>0n?(idr*BigInt(10000+state.settings.buy_markup_bps)+denominator-1n)/denominator:0n;
 }
 function render(){
- const b=state.balance,s=state.settings,m=reference(),capital=cardCapitalTotals(state.transactions);
+ const b=state.balance,s=state.settings,m=reference(),capital=cardCapitalTotals(state);
  const basis=capital.lkrCents>0n?Number(capital.idr)*100/Number(capital.lkrCents):null,buy=buyQuote(capital);
  $("rateSource").textContent=auto?"KURS OTOMATIS":"KURS GOOGLE";$("fxCredit").classList.toggle("hidden",!auto);
  const stamp=m?new Date(auto?fx.at:s.google_set_at).toLocaleString("id-ID",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"";
- // Modal IDR shows customer sales at 101% of actual paid IDR; cash and cost basis stay actual.
- const modalIdr=BigInt(Math.round(b.base_amount))+(capital.customerSellIdr*101n+50n)/100n;
- const vals={baseBal:L.idr(modalIdr),tradeBal:L.fmt(Number(capital.lkrCents)/100)+" LKR",lkrHand:L.fmt(b.lkr_in_hand)+" LKR",idrHand:L.idr(b.cash_idr),basis:basis===null?"—":L.rate(basis),buyRate:buy?L.rate(buy):"—",sellRate:sellQuote()?L.rate(sellQuote()):"—",marketRate:m?"Rp "+L.fmt(m,6):"—",rateMsg:auto?(fxLoading?"Memuat…":m?stamp:"Data belum tersedia"):(m?"Manual · "+stamp:"Pilih sumber kurs")};
+ const vals={baseBal:L.idr(capital.idr),tradeBal:L.fmt(Number(capital.lkrCents)/100)+" LKR",lkrHand:L.fmt(b.lkr_in_hand)+" LKR",idrHand:L.idr(b.cash_idr),basis:basis===null?"—":"Rp "+L.fmt(basis,6),buyRate:buy?L.rate(buy):"—",sellRate:sellQuote()?L.rate(sellQuote()):"—",marketRate:m?"Rp "+L.fmt(m,6):"—",rateMsg:auto?(fxLoading?"Memuat…":m?stamp:"Data belum tersedia"):(m?"Manual · "+stamp:"Pilih sumber kurs")};
  for(const [k,v] of Object.entries(vals))$(k).textContent=v;
 }
 function groupAmount(input,event){
