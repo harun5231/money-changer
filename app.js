@@ -57,17 +57,30 @@ function render(){
  const vals={baseBal:L.idr(capital.idr),tradeBal:L.fmt(Number(capital.lkrCents)/100)+" LKR",lkrHand:L.fmt(b.lkr_in_hand)+" LKR",idrHand:L.idr(b.cash_idr),basis:basis===null?"—":"Rp "+L.fmt(basis,6),buyRate:buy?L.rate(buy):"—",sellRate:sellQuote()?L.rate(sellQuote()):"—",marketRate:m?"Rp "+L.fmt(m,6):"—",rateMsg:auto?(fxLoading?"Memuat…":m?stamp:"Data belum tersedia"):(m?"Manual · "+stamp:"Pilih sumber kurs")};
  for(const [k,v] of Object.entries(vals))$(k).textContent=v;
 }
-function groupAmount(input,event){
+function displayAmount(plain){return plain.replace(/^\d+/,digits=>digits.replace(/\B(?=(\d{3})+(?!\d))/g,"."))}
+function groupAmount(input,event,decimal=false){
  const raw=input.value, pos=input.selectionStart;
- if(event?.inputType==="insertFromPaste"&&raw.includes(".")&&!/^\d{1,3}(?:\.\d{3})+(?:,\d*)?$/.test(raw))return;
- if(!/^[\d.]*(?:,\d*)?$/.test(raw))return;
- let plain=raw.replaceAll(".","");
- let left=pos===null?null:raw.slice(0,pos).replaceAll(".","").length;
+ let value=raw, caret=pos;
+ if(decimal){
+  // Keep generated thousands dots, but treat a decimal-key dot as a comma.
+  const dot=pos===null?-1:pos-1;
+  const addedDot=event?.inputType==="insertText"&&dot>=0&&raw[dot]==="."&&(event.data==="."||(event.data==null&&raw.slice(0,dot)+raw.slice(dot+1)===displayAmount(input.dataset.plainAmount??"")));
+  if(addedDot&&!raw.includes(",")){
+   value=raw.slice(0,dot)+","+raw.slice(dot+1).replaceAll(".","");
+  }else if(event?.inputType==="insertFromPaste"&&/^\d*\.\d{1,2}$/.test(raw)){
+   value=raw.replace(".",",");
+  }
+  if(value.startsWith(",")){value="0"+value;if(caret!==null)caret++}
+ }
+ if(event?.inputType==="insertFromPaste"&&value.includes(".")&&!/^\d{1,3}(?:\.\d{3})+(?:,\d*)?$/.test(value))return;
+ if(!/^[\d.]*(?:,\d*)?$/.test(value))return;
+ let plain=value.replaceAll(".","");
+ let left=caret===null?null:value.slice(0,caret).replaceAll(".","").length;
  // If backspace removed only a separator, remove the digit just before it.
  if(event?.inputType==="deleteContentBackward"&&plain===input.dataset.plainAmount&&left>0){
   plain=plain.slice(0,left-1)+plain.slice(left);left--;
  }
- const grouped=plain.replace(/^\d+/,digits=>digits.replace(/\B(?=(\d{3})+(?!\d))/g,"."));
+ const grouped=displayAmount(plain);
  input.dataset.plainAmount=plain;
  if(grouped===raw)return;
  input.value=grouped;
@@ -85,7 +98,7 @@ function modal(title,help,fields,action,cb){
   const [name,label,value,opts,kind]=f, wrap=E("div"), l=E("label",label), i=E(opts?"select":"input");wrap.className="field";l.htmlFor=i.id="f_"+name;
   if(opts){for(const o of opts){const e=E("option",o);e.value=o;i.append(e)}}
   else {i.inputMode=kind==="text"?"text":"decimal";i.autocomplete="off";i.maxLength=140}
-  i.value=value??"";if(kind==="amount"){i.dataset.plainAmount=i.value.replaceAll(".","");i.oninput=e=>groupAmount(i,e)}
+  i.value=value??"";if(kind==="amount"||kind==="lkr"){i.dataset.plainAmount=i.value.replaceAll(".","");i.oninput=e=>groupAmount(i,e,kind==="lkr")}
   wrap.append(l,i);form.append(wrap);els[name]=i;
  }
  const b=E("button",action);b.className="primary";form.append(b);box.append(form);
@@ -94,14 +107,14 @@ function modal(title,help,fields,action,cb){
 }
 function close(){$("modal").classList.add("hidden")}
 $("close").onclick=close;
-const field=(name,label,n)=>[name,label,n==null||n===0?"":L.fmt(n,6),null,name==="rate"?null:"amount"];
+const field=(name,label,n,kind="amount")=>[name,label,n==null||n===0?"":L.fmt(n,6),null,name==="rate"?null:kind];
 const val=(els,k,negative=false)=>L.parse(els[k].value,negative);
 $("fresh").onclick=()=>{try{save(L.create());notice("Buku LKR baru dibuat. Masukkan modal untuk mulai.");refreshAuto()}catch(e){notice(e.message)}};
-$("capitalBtn").onclick=()=>modal("Tambah Modal","Masukkan jumlah yang benar-benar kau tambahkan ke kas atau stok.",[field("a","Modal IDR"),field("u","Modal LKR")],"Simpan",e=>{change(d=>L.capital(d,val(e,"a"),val(e,"u")));notice("Modal tersimpan.")});
+$("capitalBtn").onclick=()=>modal("Tambah Modal","Masukkan jumlah yang benar-benar kau tambahkan ke kas atau stok.",[field("a","Modal IDR"),field("u","Modal LKR",null,"lkr")],"Simpan",e=>{change(d=>L.capital(d,val(e,"a"),val(e,"u")));notice("Modal tersimpan.")});
 for(const [id,type,title] of [["buyBtn","CUSTOMER_BUY","Customer beli LKR"],["sellBtn","CUSTOMER_SELL","Customer jual LKR"]]){
  $(id).onclick=()=>{
  const weBuy=type==="CUSTOMER_SELL";
- const els=modal(title,null,[field("qty","Jumlah LKR"),field("cash",weBuy?"IDR dibayar":"IDR diterima"),["n","Nama customer (opsional)","",null,"text"]],"Catat transaksi",e=>{
+ const els=modal(title,null,[field("qty","Jumlah LKR",null,"lkr"),field("cash",weBuy?"IDR dibayar":"IDR diterima"),["n","Nama customer (opsional)","",null,"text"]],"Catat transaksi",e=>{
   change(d=>L.exchange(d,{type,amount:val(e,"qty"),paid:val(e,"cash"),profit:0,name:e.n.value.trim()}));notice("Transaksi LKR tersimpan.")
  });
  let derived=null;
