@@ -6,7 +6,7 @@ const autoKey="money-changer-lkr-auto-source-v1";
 let auto=false,fx=null,fxLoading=false,tappedAt=0;
 try{auto=localStorage.getItem(autoKey)==="exchangerate.dev"}catch{}
 const reference=()=>auto?(FX.eligible(fx)?fx.rate:0):L.google(state);
-const buyQuote=()=>L.buy(state,reference()),sellQuote=()=>Math.round(L.sell(state,reference()));
+const buyQuote=()=>L.buy(state,reference()),sellQuote=()=>Math.floor(reference()*985/1000);
 async function refreshAuto(force=false){
  if(!state||!auto||fxLoading||(!force&&Date.now()-tappedAt<120000))return;
  tappedAt=Date.now();fxLoading=true;render();
@@ -92,7 +92,7 @@ function showGoogleRate(){
 };
 $("settingsBtn").onclick=()=>{
  const s=state.settings;
- modal("Pengaturan","Kurs jual berlaku saat customer menjual LKR ke kau. Harga ditampilkan dalam rupiah bulat.",[field("bm","Margin beli (%)",100*s.buy_margin),field("u","Pembulatan kurs beli (IDR)",s.rounding_unit),["bank","Nama bank",s.bank_name,null,"text"],["acc","Nomor rekening",s.bank_account_number,null,"text"],["holder","Atas nama",s.bank_account_name,null,"text"]],"Simpan",e=>{
+ modal("Pengaturan","Kurs jual berlaku saat customer menjual LKR ke kau. Harga dibulatkan ke bawah ke rupiah utuh.",[field("bm","Margin beli (%)",100*s.buy_margin),field("u","Pembulatan kurs beli (IDR)",s.rounding_unit),["bank","Nama bank",s.bank_name,null,"text"],["acc","Nomor rekening",s.bank_account_number,null,"text"],["holder","Atas nama",s.bank_account_name,null,"text"]],"Simpan",e=>{
  change(d=>Object.assign(d.settings,{buy_margin:val(e,"bm")/100,rounding_unit:val(e,"u"),bank_name:e.bank.value.trim(),bank_account_number:e.acc.value.trim(),bank_account_name:e.holder.value.trim()}));notice("Pengaturan tersimpan.");
  });
  if(auto){
